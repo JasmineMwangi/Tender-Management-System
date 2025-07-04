@@ -1,0 +1,85 @@
+/* frontend/src/App.css */
+.App {
+  min-height: 100vh;
+}
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #007bff;
+  margin: 0;
+}
+
+.recent-items {
+  display: grid;
+  gap: 1rem;
+}
+
+.recent-items .card {
+  transition: transform 0.2s ease;
+}
+
+.recent-items .card:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .layout-content {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    order: 2;
+  }
+  
+  .main-content {
+    order: 1;
+  }
+  
+  .navbar {
+    padding: 0 1rem;
+  }
+  
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+}
