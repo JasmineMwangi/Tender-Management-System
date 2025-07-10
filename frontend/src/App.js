@@ -1,15 +1,18 @@
 // frontend/src/App.js
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import LandingPage from './components/auth/LandingPage'; 
 import LoginForm from './components/auth/LoginForm';
+import RegisterForm from './components/auth/RegisterForm'; 
 import Dashboard from './pages/Dashboard';
 import './App.css';
 
-// Placeholder components for routes
-const RegisterForm = () => <div>Register Form</div>;
+// Dummy placeholders
 const TenderList = () => <div>Tender List</div>;
 const TenderCreate = () => <div>Create Tender</div>;
 const BidList = () => <div>Bid List</div>;
@@ -23,21 +26,22 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
-            {/* Public routes */}
+            {/* ✅ Public Routes */}
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
-            
-            {/* Protected routes */}
-            <Route path="/" element={
+
+            {/* ✅ Protected Routes under /app */}
+            <Route path="/app" element={
               <ProtectedRoute>
                 <Layout />
               </ProtectedRoute>
             }>
-              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
-              
-              {/* Admin routes */}
+
+              {/* Admin */}
               <Route path="users" element={
                 <ProtectedRoute roles={['admin']}>
                   <UserList />
@@ -48,8 +52,8 @@ function App() {
                   <Reports />
                 </ProtectedRoute>
               } />
-              
-              {/* Procuring Entity routes */}
+
+              {/* Procuring Entity */}
               <Route path="my-tenders" element={
                 <ProtectedRoute roles={['procuring_entity']}>
                   <TenderList />
@@ -60,8 +64,8 @@ function App() {
                   <TenderCreate />
                 </ProtectedRoute>
               } />
-              
-              {/* Bidder routes */}
+
+              {/* Bidder */}
               <Route path="available-tenders" element={
                 <ProtectedRoute roles={['bidder']}>
                   <TenderList />
@@ -72,8 +76,8 @@ function App() {
                   <BidList />
                 </ProtectedRoute>
               } />
-              
-              {/* Shared routes */}
+
+              {/* Shared */}
               <Route path="tenders" element={
                 <ProtectedRoute roles={['admin', 'procuring_entity']}>
                   <TenderList />

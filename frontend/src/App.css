@@ -1,85 +1,45 @@
 /* frontend/src/App.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: your custom styles below */
+
 .App {
   min-height: 100vh;
 }
 
 .auth-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: #f8f9fa;
+  @apply flex justify-center items-center min-h-screen bg-gray-100;
 }
 
 .auth-card {
-  width: 100%;
-  max-width: 400px;
-  padding: 2rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  @apply w-full max-w-md p-8 bg-white rounded-lg shadow-md;
 }
 
 .dashboard {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.dashboard-header {
-  margin-bottom: 2rem;
+  @apply max-w-6xl mx-auto;
 }
 
 .dashboard-header h1 {
-  color: #495057;
-  margin-bottom: 0.5rem;
+  @apply text-gray-700 mb-2;
 }
 
 .stats-cards {
-  display: grid;
+  @apply grid gap-4 mb-8;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
 }
 
 .stat-number {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #007bff;
-  margin: 0;
-}
-
-.recent-items {
-  display: grid;
-  gap: 1rem;
+  @apply text-3xl font-bold text-blue-600;
 }
 
 .recent-items .card {
-  transition: transform 0.2s ease;
+  @apply transition-transform;
 }
-
 .recent-items .card:hover {
   transform: translateY(-2px);
 }
 
-@media (max-width: 768px) {
-  .layout-content {
-    flex-direction: column;
-  }
-  
-  .sidebar {
-    width: 100%;
-    order: 2;
-  }
-  
-  .main-content {
-    order: 1;
-  }
-  
-  .navbar {
-    padding: 0 1rem;
-  }
-  
-  .stats-cards {
-    grid-template-columns: 1fr;
-  }
-}
+
