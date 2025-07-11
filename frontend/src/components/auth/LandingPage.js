@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Users, Building, FileText, Shield, Clock, Award, CheckCircle, ArrowRight, Menu, X, Star } from 'lucide-react';
 
+
 const TenderManagementLanding = () => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -95,12 +98,21 @@ const TenderManagementLanding = () => {
               </nav>
             </div>
 
-            <div className="hidden md:flex items-center space-x-4">
-              <button className="text-gray-700 hover:text-blue-600 transition-colors font-medium">Login</button>
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-medium">
-                Register
-              </button>
-            </div>
+            <div className="pt-2 border-t">
+  <button
+    onClick={() => navigate('/login')}
+    className="block w-full text-left py-2 text-gray-700 hover:text-blue-600"
+  >
+    Login
+  </button>
+  <button
+    onClick={() => navigate('/register')}
+    className="block w-full mt-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-lg"
+  >
+    Register
+  </button>
+</div>
+
 
             <button 
               className="md:hidden"
@@ -349,8 +361,6 @@ const TenderManagementLanding = () => {
           
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
             <p>&copy; 2025 TenderPro. All rights reserved.</p>
-    
-
           </div>
         </div>
       </footer>
