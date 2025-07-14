@@ -8,7 +8,8 @@ import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import LandingPage from './components/auth/LandingPage'; 
 import LoginForm from './components/auth/LoginForm';
-import RegisterForm from './components/auth/RegisterForm'; 
+import BidderRegister from './components/auth/BidderRegister';
+import OrganizationRegister from './components/auth/OrganizationRegister';
 import Dashboard from './pages/Dashboard';
 import './App.css';
 
@@ -29,7 +30,9 @@ function App() {
             {/* ✅ Public Routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginForm />} />
-            <Route path="/register" element={<RegisterForm />} />
+           <Route path="/register/bidder" element={<BidderRegister />} />
+           <Route path="/register/organization" element={<OrganizationRegister />} />
+
             <Route path="/unauthorized" element={<Unauthorized />} />
 
             {/* ✅ Protected Routes under /app */}

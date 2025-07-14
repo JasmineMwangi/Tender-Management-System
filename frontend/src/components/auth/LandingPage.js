@@ -7,6 +7,7 @@ const TenderManagementLanding = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +16,14 @@ const TenderManagementLanding = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+   const handleOrganizationClick = () => {
+    navigate('/register');
+  };
+
+  const handleBidderClick = () => {
+     navigate('/register');
+  };
 
   const features = [
     {
@@ -98,19 +107,19 @@ const TenderManagementLanding = () => {
               </nav>
             </div>
 
-            <div className="pt-2 border-t">
+<div className="pt-2 border-t">
   <button
     onClick={() => navigate('/login')}
     className="block w-full text-left py-2 text-gray-700 hover:text-blue-600"
   >
     Login
   </button>
-  <button
+  {/* <button
     onClick={() => navigate('/register')}
     className="block w-full mt-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-lg"
   >
     Register
-  </button>
+  </button> */}
 </div>
 
 

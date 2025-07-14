@@ -1,6 +1,7 @@
 // frontend/src/contexts/AuthContext.js
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { authAPI } from '../services/api';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -82,6 +83,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const registerBidder = async (data) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      const response = await axios.post('/api/auth/register/bidder', data);
+      dispatch({ type: 'LOGIN_SUCCESS', payload: response.data });
+      return response.data;
+    } catch (error) {
+      dispatch({ type: 'LOGIN_FAIL', payload: error.response?.data?.message || 'Bidder registration failed' });
+      throw error;
+    }
+  };
+
+  const registerOrganization = async (data) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      const response = await axios.post('/api/auth/register/organization', data);
+      dispatch({ type: 'LOGIN_SUCCESS', payload: response.data });
+      return response.data;
+    } catch (error) {
+      dispatch({ type: 'LOGIN_FAIL', payload: error.response?.data?.message || 'Organization registration failed' });
+      throw error;
+    }
+  };
+
   const logout = () => {
     dispatch({ type: 'LOGOUT' });
   };
@@ -103,15 +128,16 @@ export const AuthProvider = ({ children }) => {
         dispatch({ type: 'SET_LOADING', payload: false });
       }
     };
-
     loadUser();
-  }, []);
+  }, [state.token]);
 
   return (
     <AuthContext.Provider value={{
       ...state,
       login,
       register,
+      registerBidder,
+      registerOrganization,
       logout,
       clearError
     }}>
