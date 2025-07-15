@@ -83,7 +83,7 @@ const Dashboard = () => {
             <div className="recent-items">
               {bidLoading ? (
                 <div className="loading-spinner">
-                  <div className="spinner"></div>
+                  <div className="spinswitchner"></div>
                 </div>
               ) : (
                 bidStats?.data?.map(bid => (

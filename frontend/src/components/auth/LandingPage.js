@@ -150,7 +150,7 @@ const TenderManagementLanding = () => {
         )}
       </header>
 
-      {/* Hero Section */}
+      /* Hero Section */
       <section id="home" className="pt-16 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
@@ -179,9 +179,11 @@ const TenderManagementLanding = () => {
               </button>
             </div>
 
-            {/* User Type Selection */}
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-blue-300">
+              <div
+                className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-blue-300"
+                onClick={() => navigate('/register/organization')}
+              >
                 <div className="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-lg mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
                   <Building className="w-8 h-8 text-blue-600" />
                 </div>
@@ -192,7 +194,10 @@ const TenderManagementLanding = () => {
                 </button>
               </div>
               
-              <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-purple-300">
+              <div
+                className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-200 hover:border-purple-300"
+                onClick={() => navigate('/register/bidder')}
+              >
                 <div className="flex items-center justify-center w-16 h-16 bg-purple-100 rounded-lg mx-auto mb-4 group-hover:bg-purple-200 transition-colors">
                   <Users className="w-8 h-8 text-purple-600" />
                 </div>
@@ -207,7 +212,7 @@ const TenderManagementLanding = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+    
       <section id="features" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">

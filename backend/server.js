@@ -9,7 +9,8 @@ const morgan = require('morgan');
 const path = require('path');
 const { errorHandler, notFound } = require('./middlewares/errorMiddleware');
 const { connectDB } = require('./config/database');require('dotenv').config();
-
+const listEndpoints = require('express-list-endpoints');
+const { registerBidder } = require('./controllers/authController');
 const app = express();
 
 // Security middleware
@@ -42,10 +43,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
 //app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/auth', require('./routes/auth'));
-// app.use('/api/users', require('./routes/userRoutes'));
-//app.use('/api/tenders', require('./routes/tenderRoutes'));
-// app.use('/api/bids', require('./routes/bidRoutes'));
-// app.use('/api/reports', require('./routes/reportRoutes'));
+
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -62,6 +60,9 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     await connectDB();
+
+      // ✅ Log available routes
+    console.table(listEndpoints(app));
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
@@ -70,5 +71,8 @@ const startServer = async () => {
     process.exit(1);
   }
 };
+
+
+
 
 startServer();
