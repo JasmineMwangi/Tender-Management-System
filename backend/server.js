@@ -12,6 +12,7 @@ const { connectDB } = require('./config/database');require('dotenv').config();
 const listEndpoints = require('express-list-endpoints');
 const { registerBidder } = require('./controllers/authController');
 const app = express();
+const { sequelize } = require('./config/database');
 
 // Security middleware
 app.use(helmet());
@@ -60,6 +61,13 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     await connectDB();
+
+
+
+    // Sync models with DB structure
+    // await sequelize.sync({ alter: true, logging: console.log });
+    await sequelize.sync({ force: true, logging: console.log });
+
 
       // ✅ Log available routes
     console.table(listEndpoints(app));

@@ -2,18 +2,18 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('users', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      firstName: {
+      first_name: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      lastName: {
+      last_name: {
         type: Sequelize.STRING,
         allowNull: false
       },
@@ -33,8 +33,8 @@ module.exports = {
         allowNull: false
       },
       role: {
-        type: Sequelize.ENUM('admin', 'user'),
-        defaultValue: 'user'
+        type: Sequelize.ENUM('admin','organisation', 'bidder'),
+        defaultValue: 'bidder' // Default role is 'bidder'
       },
       created_at: {
         allowNull: false,
@@ -46,20 +46,14 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
-      status: {
-        type: Sequelize.ENUM('active', 'inactive'),
-        defaultValue: 'active'
-      } ,
       deleted_at: {
         type: Sequelize.DATE,
         allowNull: true
       }
-
-
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('users');
   }
 };

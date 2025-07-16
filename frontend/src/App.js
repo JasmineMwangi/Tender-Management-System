@@ -27,12 +27,15 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
-            {/* ✅ Public Routes */}
+            /* ✅ Public Routes */
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginForm />} />
-           <Route path="/register/bidder" element={<BidderRegister />} />
-           <Route path="/register/organization" element={<OrganizationRegister />} />
-
+            <Route path="/register/bidder" element={<BidderRegister />} />
+            <Route path="/register/organization" element={<OrganizationRegister />} />
+            {/* <Route path="/dashboard" element={
+                <Dashboard />
+           
+            } /> */}
             <Route path="/unauthorized" element={<Unauthorized />} />
 
             {/* ✅ Protected Routes under /app */}

@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
+const JWT_SECRET = process.env. JWT_SECRET || 'supersecret';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
 
 // Helper: Generate token
@@ -15,7 +15,7 @@ const generateToken = (user) => {
 
 // POST /api/auth/register/bidder
 exports.registerBidder = async (req, res) => {
-  const { firstName, lastName, email, phone, password } = req.body;
+  const { first_name, last_name, email, phone, password,role } = req.body;
 
   try {
     const existing = await User.findOne({ where: { email } });
@@ -23,14 +23,13 @@ exports.registerBidder = async (req, res) => {
       return res.status(400).json({ message: 'Email already in use' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
-      firstName,
-      lastName,
+      first_name,
+      last_name,
       email,
       phone,
-      password: hashedPassword,
-      role: 'bidder'
+      password,
+      role,
     });
 
     const token = generateToken(user);
@@ -46,7 +45,7 @@ exports.registerOrganization = async (req, res) => {
 
   try {
     const existing = await User.findOne({ where: { email } });
-    if (existing) {
+    if (existing) {password123
       return res.status(400).json({ message: 'Email already in use' });
     }
 

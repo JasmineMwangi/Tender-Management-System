@@ -1,12 +1,14 @@
+const BaseModel = require('./BaseModel');
 const bcrypt = require('bcryptjs');
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
-    firstName: {
+    ...BaseModel,
+    first_name: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    lastName: {
+    last_name: {
       type: DataTypes.STRING,
       allowNull: false
     },
@@ -17,22 +19,24 @@ module.exports = (sequelize, DataTypes) => {
       validate: { isEmail: true }
     },
     phone: {
-      type: DataTypes.STRING,
-      allowNull: true
+      type: DataTypes.STRING
     },
     organization: {
-      type: DataTypes.STRING,
-      allowNull: true
+      type: DataTypes.STRING
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false
     },
     role: {
-      type: DataTypes.ENUM('admin', 'user'),
-      defaultValue: 'user'
+      type: DataTypes.ENUM('admin', 'organisation', 'bidder',),
+      defaultValue: 'bidder' // Default role is 'bidder'
     }
   }, {
+    tableName: 'users',         // 👈 matches snake_case, lowercase
+    timestamps: true,           // Sequelize adds created_at, updated_at
+    underscored: true,          // Maps all keys to snake_case
+    paranoid: true,             // Enables soft deletes (deleted_at)
     hooks: {
       beforeCreate: async (user) => {
         if (user.password) {
@@ -42,9 +46,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
 
-  // Instance method
+  // Password comparison method
   User.prototype.comparePassword = async function (password) {
-    return await bcrypt.compare(password, this.password);
+    return await bcrypt.compare(password, user.password);
   };
 
   return User;

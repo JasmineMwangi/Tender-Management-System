@@ -14,7 +14,7 @@ module.exports = {
         organization: 'BuildVision Ltd',
         password: hashedPassword,
         role: 'user',
-        created_at: new Date(),
+        created_at : new Date(),
         updated_at: new Date(),
       },
       {
