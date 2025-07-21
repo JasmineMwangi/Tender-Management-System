@@ -32,7 +32,8 @@ const LoginForm = () => {
       setLoading(true);
       setError('');
       await login(formData);
-      navigate('/dashboard');
+      // navigate('/dashboard');
+      navigate('/app/dashboard'); // ✅ uses layout + protection
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
@@ -61,7 +62,7 @@ const LoginForm = () => {
         <div className="text-center mt-3">
           <p>
             Don't have an account?{' '}
-            <Link to="/register">Register here</Link>
+            <Link to="/">Register here</Link>
           </p>
         </div>
       </div>

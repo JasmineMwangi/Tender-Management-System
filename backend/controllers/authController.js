@@ -41,11 +41,11 @@ exports.registerBidder = async (req, res) => {
 
 // POST /api/auth/register/organization
 exports.registerOrganization = async (req, res) => {
-  const { organization, email, phone, password } = req.body;
+  const { organization,first_name,last_name, email, phone, password } = req.body;
 
   try {
     const existing = await User.findOne({ where: { email } });
-    if (existing) {password123
+    if (existing) {
       return res.status(400).json({ message: 'Email already in use' });
     }
 
@@ -53,11 +53,13 @@ exports.registerOrganization = async (req, res) => {
     const user = await User.create({
       organization,
       email,
+      first_name,
+      last_name,
       phone,
       password: hashedPassword,
-      role: 'organization'
+      role: 'organisation'
     });
-registerBidder
+
     const token = generateToken(user);
     res.status(201).json({ token, user });
   } catch (error) {

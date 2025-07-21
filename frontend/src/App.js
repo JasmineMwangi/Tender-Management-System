@@ -32,10 +32,7 @@ function App() {
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register/bidder" element={<BidderRegister />} />
             <Route path="/register/organization" element={<OrganizationRegister />} />
-            {/* <Route path="/dashboard" element={
-                <Dashboard />
-           
-            } /> */}
+            {/* <Route path="/dashboard" element={<Dashboard />} /> */}
             <Route path="/unauthorized" element={<Unauthorized />} />
 
             {/* ✅ Protected Routes under /app */}

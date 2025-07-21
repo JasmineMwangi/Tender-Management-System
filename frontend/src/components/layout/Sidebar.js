@@ -18,12 +18,12 @@ const Sidebar = ({ userRole }) => {
         { path: '/bids', label: 'All Bids', icon: '📝' },
         { path: '/reports', label: 'Reports', icon: '📈' }
       ],
-      procuring_entity: [
+      organisation: [
         { path: '/my-tenders', label: 'My Tenders', icon: '📋' },
         { path: '/tender/create', label: 'Create Tender', icon: '➕' },
         { path: '/bids/received', label: 'Received Bids', icon: '📥' }
       ],
-      bidder: [
+      user: [
         { path: '/available-tenders', label: 'Available Tenders', icon: '🔍' },
         { path: '/my-bids', label: 'My Bids', icon: '📝' },
         { path: '/bid-history', label: 'Bid History', icon: '📜' }
