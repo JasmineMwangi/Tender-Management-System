@@ -11,6 +11,10 @@ const { errorHandler, notFound } = require('./middlewares/errorMiddleware');
 const { connectDB } = require('./config/database');require('dotenv').config();
 const listEndpoints = require('express-list-endpoints');
 const { registerBidder } = require('./controllers/authController');
+
+// const tenderRoutes = require('./routes/tenderRoutes');
+const tenderRoutes = require('./routes/tenderRoutes');
+
 const app = express();
 const { sequelize } = require('./config/database');
 
@@ -50,6 +54,9 @@ app.use('/api/auth', require('./routes/auth'));
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
+
+app.use('/api/tenders', tenderRoutes); // ← this is the base URL
 
 // Error handling middleware
 app.use(notFound);
