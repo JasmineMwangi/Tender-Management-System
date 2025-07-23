@@ -4,7 +4,7 @@ const { Op } = require('sequelize');
 // Create a new tender
 exports.createTender = async (req, res) => {
   try {
-    const tender = await Tender.create(req.body);
+    const tender = await tender.create(req.body);
     return res.status(201).json(tender);
   } catch (err) {
     console.error(err);

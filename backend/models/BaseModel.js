@@ -44,11 +44,17 @@
 const { DataTypes } = require('sequelize');
 
 const BaseModel = {
-id: {
-  type: DataTypes.INTEGER,
-  autoIncrement: true,
-  primaryKey: true
-},
+// id: {
+//   type: DataTypes.INTEGER,
+//   autoIncrement: true,
+//   primaryKey: true
+// },
+
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   created_at: {
     type: DataTypes.UUID,
     allowNull: true,

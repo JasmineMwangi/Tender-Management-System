@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     ...BaseModel,
+    
     first_name: {
       type: DataTypes.STRING,
       allowNull: false
@@ -51,5 +52,10 @@ module.exports = (sequelize, DataTypes) => {
     return await bcrypt.compare(password, user.password);
   };
 
+
+  User.associate = models => {
+    User.hasMany(models.Tender, { foreignKey: 'organisationId' });
+    User.hasMany(models.Bid, { foreignKey: 'bidderId' });
+};
   return User;
 };
