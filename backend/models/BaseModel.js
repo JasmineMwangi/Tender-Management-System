@@ -8,21 +8,21 @@ const BaseModel = {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
-  createdAt: {
+  created_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
-  updatedAt: {
+  updated_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
-  deletedAt: {
+  deleted_at: {
     type: DataTypes.DATE,
     allowNull: true,
   },
-  createdBy: {
+  created_by: {
     type: DataTypes.UUID,
     allowNull: true,
     references: {
@@ -30,7 +30,7 @@ const BaseModel = {
       key: 'id'
     }
   },
-  updatedBy: {
+  updated_by: {
     type: DataTypes.UUID,
     allowNull: true,
     references: {

@@ -91,7 +91,7 @@ const Dashboard = () => {
                     <div className="card-body">
                       <h4>{bid.tender?.title || 'Tender'}</h4>
                       <p className="text-muted">Status: {bid.status}</p>
-                      <p className="text-muted">Submitted: {new Date(bid.createdAt).toLocaleDateString()}</p>
+                      <p className="text-muted">Submitted: {new Date(bid.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
                 ))

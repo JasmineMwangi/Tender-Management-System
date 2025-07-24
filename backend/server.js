@@ -13,6 +13,9 @@ const listEndpoints = require('express-list-endpoints');
 const { registerBidder } = require('./controllers/authController');
 const app = express();
 
+const logger = require('./utils/logger');
+
+
 // Security middleware
 app.use(helmet());
 app.use(cors({
