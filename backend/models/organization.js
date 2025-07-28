@@ -20,8 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     underscored: true
   });
 
-  Organization.hasMany(Tender, { foreignKey: 'organization_id' });
-Tender.belongsTo(Organization, { foreignKey: 'organization_id' });
+//   Organization.hasMany(Tender, { foreignKey: 'organization_id' });
+// Tender.belongsTo(Organization, { foreignKey: 'organization_id' });
 
 
   return Organization;

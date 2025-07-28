@@ -1,27 +1,60 @@
 'use strict';
-const { Model } = require('sequelize');
-
 module.exports = (sequelize, DataTypes) => {
-    class Bid extends Model {
-        static associate(models) {
-            Bid.belongsTo(models.User, { foreignKey: 'userId' });
-            Bid.belongsTo(models.Tender, { foreignKey: 'tenderId' });
-            Bid.hasMany(models.BidDocument, { foreignKey: 'bid_id' });
-            Bid.hasOne(models.AiScore, { foreignKey: 'bid_id' });
-        }
+  const Bid = sequelize.define('Bid', { // Using sequelize.define for consistency
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    amount: {
+      type: DataTypes.DECIMAL(15, 2),
+      allowNull: false
+    },
+    proposal: {
+      type: DataTypes.TEXT,
+      allowNull: false
+    },
+    status: {
+      type: DataTypes.ENUM('submitted', 'reviewed', 'qualified', 'rejected', 'awarded'),
+      defaultValue: 'submitted'
+    },
+    type: DataTypes.STRING,
+    bidderId: { // Match the foreign key name used in User model
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'users',
+        key: 'id'
+      }
+    },
+    tenderId: { // Match the foreign key name used in Tender model
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'tenders',
+        key: 'id'
+      }
     }
+  }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    paranoid: true,
+    deletedAt: 'deleted_at',
+    tableName: 'bids',
+    underscored: true
+  });
 
-    Bid.init({
-        userId: DataTypes.INTEGER,
-        tenderID: DataTypes.INTEGER,
-        status: DataTypes.ENUM('submitted', 'reviewed', 'qualified', 'rejected', 'awarded'),
-        type: DataTypes.STRING // Added type field
-    }, {
-        sequelize,
-        modelName: 'Bid',
-        paranoid: true,
-        underscored: true
+  Bid.associate = models => {
+    Bid.belongsTo(models.User, { 
+      foreignKey: 'bidderId',
+      as: 'bidder' 
     });
+    Bid.belongsTo(models.Tender, { 
+      foreignKey: 'tenderId',
+      as: 'tender' 
+    });
+  };
 
-    return Bid;
+  return Bid;
 };

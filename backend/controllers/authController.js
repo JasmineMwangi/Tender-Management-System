@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
+const JWT_SECRET = process.env. JWT_SECRET || 'supersecret';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
 
 // Helper: Generate token
@@ -14,8 +14,36 @@ const generateToken = (user) => {
 };
 
 // POST /api/auth/register/bidder
+// exports.registerBidder = async (req, res) => {
+//   const { name, email, phone, password } = req.body;
+
+//   try {
+//     const existing = await User.findOne({ where: { email } });
+//     if (existing) {
+//       return res.status(400).json({ message: 'Email already in use' });
+//     }
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+//     const user = await User.create({
+//       name,
+//       email,
+//       phone,
+//       password: hashedPassword,
+//       role: 'bidder',
+//       status: 'active',
+//       emailVerified: 0
+//     });
+
+//     const token = generateToken(user);
+//     res.status(201).json({ token, user });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Registration failed', error: error.message });
+//   }
+// };
+
+
 exports.registerBidder = async (req, res) => {
-  const { firstName, lastName, email, phone, password } = req.body;
+  const { name, email, phone, password } = req.body;
 
   try {
     const existing = await User.findOne({ where: { email } });
@@ -23,26 +51,31 @@ exports.registerBidder = async (req, res) => {
       return res.status(400).json({ message: 'Email already in use' });
     }
 
+    console.log('🧪 User Model Attributes:', User.getAttributes());
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
-      firstName,
-      lastName,
+      name,
       email,
       phone,
       password: hashedPassword,
-      role: 'bidder'
+      role: 'bidder',
+      status: 'active',
+      emailVerified: 0
     });
 
     const token = generateToken(user);
     res.status(201).json({ token, user });
   } catch (error) {
+    console.error('❌ Registration Error:', error); // full trace
     res.status(500).json({ message: 'Registration failed', error: error.message });
   }
 };
 
+
 // POST /api/auth/register/organization
 exports.registerOrganization = async (req, res) => {
-  const { organization, email, phone, password } = req.body;
+  const { organization,first_name,last_name, email, phone, password } = req.body;
 
   try {
     const existing = await User.findOne({ where: { email } });
@@ -54,11 +87,13 @@ exports.registerOrganization = async (req, res) => {
     const user = await User.create({
       organization,
       email,
+      first_name,
+      last_name,
       phone,
       password: hashedPassword,
-      role: 'organization'
+      role: 'organisation'
     });
-registerBidder
+
     const token = generateToken(user);
     res.status(201).json({ token, user });
   } catch (error) {

@@ -32,7 +32,7 @@ fs
   return (
     file.indexOf('.') !== 0 &&
     file !== basename &&
-    file !== 'BaseModel.js' && // 👈 Exclude it
+    file !== 'base-model.js' && // 👈 Exclude it
     file.slice(-3) === '.js' &&
     file.indexOf('.test.js') === -1
   );

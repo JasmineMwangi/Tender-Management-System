@@ -32,7 +32,7 @@ class BaseController {
     
     const order = req.query.sort ? 
       [[req.query.sort, req.query.order || 'ASC']] : 
-      [['created_at', 'DESC']];
+      [['createdAt', 'DESC']];
     
     const { count, rows } = await this.model.findAndCountAll({
       where,

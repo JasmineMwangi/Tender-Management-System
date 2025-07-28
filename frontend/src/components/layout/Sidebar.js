@@ -1,4 +1,3 @@
-// frontend/src/components/layout/Sidebar.js
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Sidebar.css';
@@ -13,20 +12,21 @@ const Sidebar = ({ userRole }) => {
 
     const roleBasedItems = {
       admin: [
-        { path: '/users', label: 'Users', icon: '👥' },
-        { path: '/tenders', label: 'All Tenders', icon: '📋' },
-        { path: '/bids', label: 'All Bids', icon: '📝' },
-        { path: '/reports', label: 'Reports', icon: '📈' }
+        { path: '/app/users', label: 'Users', icon: '👥' },
+        { path: '/app/tenders', label: 'All Tenders', icon: '📋' },
+        { path: '/app/bids', label: 'All Bids', icon: '📝' },
+        { path: '/app/reports', label: 'Reports', icon: '📈' }
       ],
-      procuring_entity: [
-        { path: '/my-tenders', label: 'My Tenders', icon: '📋' },
-        { path: '/tender/create', label: 'Create Tender', icon: '➕' },
-        { path: '/bids/received', label: 'Received Bids', icon: '📥' }
+      organisation: [
+        { path: '/app/my-tenders', label: 'My Tenders', icon: '📋' },
+        { path: '/app/tender/create', label: 'Create Tender', icon: '➕' },
+        { path: '/app/bids/received', label: 'Received Bids', icon: '📥' },
+        //{ path: '/app/reports', label: 'reports', icon: '📈' }
       ],
-      bidder: [
-        { path: '/available-tenders', label: 'Available Tenders', icon: '🔍' },
-        { path: '/my-bids', label: 'My Bids', icon: '📝' },
-        { path: '/bid-history', label: 'Bid History', icon: '📜' }
+      user: [
+        { path: '/app/available-tenders', label: 'Available Tenders', icon: '🔍' },
+        { path: '/app/my-bids', label: 'My Bids', icon: '📝' },
+        { path: '/app/bid-history', label: 'Bid History', icon: '📜' }
       ]
     };
 

@@ -1,28 +1,52 @@
 'use strict';
-const { Model } = require('sequelize');
-
 module.exports = (sequelize, DataTypes) => {
-    class Tender extends Model {
-        static associate(models) {
-            Tender.belongsTo(models.Organization, { foreignKey: 'organization_id' });
-            Tender.hasMany(models.Bid, { foreignKey: 'tender_id' });
-            Tender.hasMany(models.TenderDocument, { foreignKey: 'tender_id' });
-        }
+  const Tender = sequelize.define('Tender', { // Capitalized model name
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    title: DataTypes.STRING,
+    description: DataTypes.TEXT,
+    category: DataTypes.STRING,
+    budget: DataTypes.DECIMAL(15, 2),
+    deadline: DataTypes.DATEONLY,
+    requirements: DataTypes.TEXT,
+    contactEmail: DataTypes.STRING,
+    contactPhone: DataTypes.STRING,
+    location: DataTypes.STRING,
+    status: {
+      type: DataTypes.ENUM('draft', 'published', 'pending', 'closed'),
+      defaultValue: 'draft'
+    },
+    organisationId: { // Match the foreign key name used in User model
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'users',
+        key: 'id'
+      }
     }
+  }, {
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    paranoid: true,
+    deletedAt: 'deleted_at',
+    tableName: 'tenders',
+    underscored: true
+  });
 
-    Tender.init({
-        organization_id: DataTypes.INTEGER,
-        title: DataTypes.STRING,
-        description: DataTypes.TEXT,
-        budget: DataTypes.FLOAT,
-        deadline: DataTypes.DATE,
-        status: DataTypes.STRING // Added status field
-    }, {
-        sequelize,
-        modelName: 'Tender',
-        paranoid: true,
-        underscored: true
+  Tender.associate = models => {
+    Tender.belongsTo(models.User, { 
+      foreignKey: 'organisationId', 
+      as: 'organisation' 
     });
+    Tender.hasMany(models.Bid, { 
+      foreignKey: 'tenderId',
+      as: 'bids'
+    });
+  };
 
-    return Tender;
+  return Tender;
 };

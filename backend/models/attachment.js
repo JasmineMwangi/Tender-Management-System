@@ -1,35 +1,43 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database'); // adjust path as needed
+// models/attachment.js
 
-const Attachment = sequelize.define('Attachment', {
+
+const BaseModel = require('./base-model');
+const bcrypt = require('bcryptjs');
+
+
+
+
+module.exports = (sequelize, DataTypes) => {
+  const Attachment = sequelize.define('Attachment', {
     filename: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     originalName: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     mimeType: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     size: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     path: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    filePath: { // Added filePath field
-        type: DataTypes.STRING,
-        allowNull: false,
+    filePath: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     uploadedAt: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
     }
-});
+  });
 
-module.exports = Attachment;
+  return Attachment;
+};
