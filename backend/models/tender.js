@@ -29,12 +29,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
     paranoid: true,
-    deletedAt: 'deleted_at',
+    deletedAt: 'deletedAt',
     tableName: 'tenders',
-    underscored: true
+    underscored: false, // Use camelCase for model attributes
   });
 
   Tender.associate = models => {

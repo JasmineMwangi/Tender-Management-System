@@ -1,40 +1,107 @@
-const { Tender } = require('../models'); // adjust path if needed
+const { Tender, User } = require('../models'); // adjust path if needed
 const { Op } = require('sequelize');
 
 // Create a new tender
 exports.createTender = async (req, res) => {
   try {
-    const tender = await tender.create(req.body);
+    const tender = await Tender.create(req.body);
     return res.status(201).json(tender);
   } catch (err) {
-    console.error(err);
-    return res.status(400).json({ error: 'Failed to create tender', details: err });
+    console.error('❌ Tender creation error:', err);
+
+    // Handle Sequelize validation errors
+    if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({
+        error: 'Validation failed',
+        details: err.errors.map(e => e.message)
+      });
+    }
+
+    // Generic fallback
+    return res.status(500).json({
+      error: 'Failed to create tender',
+      details: err.message || 'Unknown error'
+    });
   }
 };
 
+
+
+// exports.createTender = async (req, res) => {
+//   try {
+//     const tender = await tender.create(req.body);
+//     return res.status(201).json(tender);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(400).json({ error: 'Failed to create tender', details: err });
+//   }
+// };
+
 // Get all tenders (optional filters: search, status)
+
+
 exports.getAllTenders = async (req, res) => {
   try {
     const { search, status } = req.query;
 
     const where = {};
-    if (status && status !== 'all') where.status = status;
+    if (status && status !== 'all') {
+      where.status = status;
+    }
 
     if (search) {
       where[Op.or] = [
-        { title: { [Op.iLike]: `%${search}%` } },
-        { description: { [Op.iLike]: `%${search}%` } },
-        { category: { [Op.iLike]: `%${search}%` } }
+        { title: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } },
+        { category: { [Op.like]: `%${search}%` } }
       ];
     }
 
-    const tenders = await Tender.findAll({ where, order: [['created_at', 'DESC']] });
+    const tenders = await Tender.findAll({
+      where,
+      include: [
+        {
+          model: User,
+          as: 'organisation',
+          attributes: ['id', 'name', 'email']
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
     return res.status(200).json(tenders);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: 'Failed to fetch tenders' });
+    return res.status(500).json({ error: 'Failed to fetch tenders', details: err.message });
   }
 };
+
+
+
+
+
+// exports.getAllTenders = async (req, res) => {
+//   try {
+//     const { search, status } = req.query;
+
+//     const where = {};
+//     if (status && status !== 'all') where.status = status;
+
+//     if (search) {
+//       where[Op.or] = [
+//         { title: { [Op.iLike]: `%${search}%` } },
+//         { description: { [Op.iLike]: `%${search}%` } },
+//         { category: { [Op.iLike]: `%${search}%` } }
+//       ];
+//     }
+
+//     const tenders = await tender.findAll({ where, order: [['createdAt', 'DESC']] });
+//     return res.status(200).json(tenders);
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ error: 'Failed to fetch tenders' });
+//   }
+// };
 
 // Get single tender by ID
 exports.getTenderById = async (req, res) => {

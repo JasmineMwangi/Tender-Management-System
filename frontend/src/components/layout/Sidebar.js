@@ -7,7 +7,9 @@ const Sidebar = ({ userRole }) => {
 
   const getMenuItems = () => {
     const commonItems = [
-      { path: '/dashboard', label: 'Dashboard', icon: '📊' }
+      { path: '/dashboard', label: 'Dashboard', icon: '📊' },
+      { path: '/app/my-tenders', label: 'My Tenders', icon: '📋' },
+
     ];
 
     const roleBasedItems = {
@@ -17,14 +19,14 @@ const Sidebar = ({ userRole }) => {
         { path: '/app/bids', label: 'All Bids', icon: '📝' },
         { path: '/app/reports', label: 'Reports', icon: '📈' }
       ],
-      organisation: [
-        { path: '/app/my-tenders', label: 'My Tenders', icon: '📋' },
+      organization: [
+        // { path: '/app/my-tenders', label: 'My Tenders', icon: '📋' },
         { path: '/app/tender/create', label: 'Create Tender', icon: '➕' },
         { path: '/app/bids/received', label: 'Received Bids', icon: '📥' },
         //{ path: '/app/reports', label: 'reports', icon: '📈' }
       ],
-      user: [
-        { path: '/app/available-tenders', label: 'Available Tenders', icon: '🔍' },
+      bidder: [
+        // { path: '/app/available-tenders', label: 'Available Tenders', icon: '🔍' },
         { path: '/app/my-bids', label: 'My Bids', icon: '📝' },
         { path: '/app/bid-history', label: 'Bid History', icon: '📜' }
       ]

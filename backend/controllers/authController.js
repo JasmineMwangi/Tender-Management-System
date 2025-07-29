@@ -72,34 +72,78 @@ exports.registerBidder = async (req, res) => {
   }
 };
 
+const { v4: uuidv4 } = require('uuid');
+//const bcrypt = require('bcrypt');
+//const { User } = require('../models');
+//const { generateToken } = require('../utils/jwt'); // Adjust based on your structure
+
 
 // POST /api/auth/register/organization
 exports.registerOrganization = async (req, res) => {
-  const { organization,first_name,last_name, email, phone, password } = req.body;
+  const { name, email, phone, password } = req.body;
 
   try {
+    // Check for existing email
     const existing = await User.findOne({ where: { email } });
     if (existing) {
       return res.status(400).json({ message: 'Email already in use' });
     }
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
     const user = await User.create({
-      organization,
+      id: uuidv4(),               // 👈 char(36) UUID
+      name,         // 👈 maps to DB's `name`
       email,
-      first_name,
-      last_name,
       phone,
       password: hashedPassword,
-      role: 'organisation'
+      role: 'organization',       // 👈 must match ENUM in DB
+      status: 'active',           // 👈 optional but safe default
+      emailVerified: false        // 👈 matches default of 0
     });
 
+    // Generate token
     const token = generateToken(user);
+
     res.status(201).json({ token, user });
   } catch (error) {
-    res.status(500).json({ message: 'Registration failed', error: error.message });
+    res.status(500).json({
+      message: 'Registration failed',
+      error: error.message
+    });
   }
 };
+
+
+// // POST /api/auth/register/organization
+// exports.registerOrganization = async (req, res) => {
+//   const { organization,first_name,last_name, email, phone, password } = req.body;
+
+//   try {
+//     const existing = await User.findOne({ where: { email } });
+//     if (existing) {
+//       return res.status(400).json({ message: 'Email already in use' });
+//     }
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+//     const user = await User.create({
+//       organization,
+//       email,
+//       first_name,
+//       last_name,
+//       phone,
+//       password: hashedPassword,
+//       role: 'organisation'
+//     });
+
+//     const token = generateToken(user);
+//     res.status(201).json({ token, user });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Registration failed', error: error.message });
+//   }
+// };
 
 // POST /api/auth/login
 exports.login = async (req, res) => {

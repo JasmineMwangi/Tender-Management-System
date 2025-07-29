@@ -3,7 +3,18 @@ import { Plus, Edit3, Trash2, Eye, Search, Filter, Calendar,DollarSign,Building,
   CheckCircle, XCircle, AlertCircle
 } from 'lucide-react';
 
+import BidDialog from '../components/auth/BidDialog';
+
 const MyTenders = () => {
+
+  const [showBidDialog, setShowBidDialog] = useState(false);
+  const [selectedTender, setSelectedTender] = useState(null);
+
+  const handlePlaceBid = (tender) => {
+    setSelectedTender(tender);
+    setShowBidDialog(true);
+  };
+
   const [tenders, setTenders] = useState([]);
   const [filteredTenders, setFilteredTenders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +23,6 @@ const MyTenders = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('create'); // 'create', 'edit', 'view'
-  const [selectedTender, setSelectedTender] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -301,62 +311,77 @@ const MyTenders = () => {
           </div>
         )}
 
-        {/* Tenders Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTenders.map((tender) => (
-            <div key={tender._id} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-semibold text-gray-900 line-clamp-2">{tender.title}</h3>
-                  {getStatusBadge(tender.status)}
-                </div>
-                
-                <p className="text-gray-600 mb-4 line-clamp-3">{tender.description}</p>
-                
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Building className="w-4 h-4 mr-2" />
-                    {tender.category}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <DollarSign className="w-4 h-4 mr-2" />
-                    {formatCurrency(tender.budget)}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Deadline: {formatDate(tender.deadline)}
-                  </div>
-                </div>
-                
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => openModal('view', tender)}
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
-                  >
-                    <Eye className="w-4 h-4" />
-                    View
-                  </button>
-                  <button
-                    onClick={() => openModal('edit', tender)}
-                    className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(tender._id)}
-                    className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Delete
-                  </button>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredTenders.map((tender) => (
+              <div key={tender._id} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                <div className="p-6">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-semibold text-gray-900 line-clamp-2">{tender.title}</h3>
+              {getStatusBadge(tender.status)}
+            </div>
+            
+            <p className="text-gray-600 mb-4 line-clamp-3">{tender.description}</p>
+            
+            <div className="space-y-2 mb-4">
+              <div className="flex items-center text-sm text-gray-500">
+                <Building className="w-4 h-4 mr-2" />
+                {tender.category}
+              </div>
+              <div className="flex items-center text-sm text-gray-500">
+                <DollarSign className="w-4 h-4 mr-2" />
+                {formatCurrency(tender.budget)}
+              </div>
+              <div className="flex items-center text-sm text-gray-500">
+                <Calendar className="w-4 h-4 mr-2" />
+                Deadline: {formatDate(tender.deadline)}
               </div>
             </div>
-          ))}
-        </div>
+            
+            <div className="flex gap-2 mb-2">
+              <button
+                onClick={() => openModal('view', tender)}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
+              >
+                <Eye className="w-4 h-4" />
+                View
+              </button>
+              <button
+                onClick={() => openModal('edit', tender)}
+                className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
+              >
+                <Edit3 className="w-4 h-4" />
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(tender._id)}
+                className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete
+              </button>
+            </div>
 
-        {/* Empty State */}
+            <button 
+              onClick={() => handlePlaceBid(tender)}
+              className="w-full bg-green-100 hover:bg-green-200 text-green-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Place Bid
+            </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Bid Dialog */}
+          {showBidDialog && selectedTender && (
+            <BidDialog
+              tender={selectedTender}
+              onClose={() => setShowBidDialog(false)}
+            />
+          )}
+
+          {/* Empty State */}
         {filteredTenders.length === 0 && !loading && (
           <div className="text-center py-12">
             <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
