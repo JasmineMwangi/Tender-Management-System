@@ -110,15 +110,11 @@ module.exports = (sequelize, DataTypes) => {
     
     hooks: {
       beforeCreate: async (user) => {
-        if (user.password) {
-          user.password = await bcrypt.hash(user.password, 12);
-        }
+        // No password hashing here; handled in the controller
       },
       
       beforeUpdate: async (user) => {
-        if (user.changed('password')) {
-          user.password = await bcrypt.hash(user.password, 12);
-        }
+        // No password hashing here; handled in the controller
       }
     }
   });
