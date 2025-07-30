@@ -11,7 +11,7 @@ const { errorHandler, notFound } = require('./middlewares/errorMiddleware');
 const { connectDB } = require('./config/database');require('dotenv').config();
 const listEndpoints = require('express-list-endpoints');
 const { registerBidder } = require('./controllers/authController');
-
+//const bidController = require('../controllers/bidController');
 // const tenderRoutes = require('./routes/tenderRoutes');
 const tenderRoutes = require('./routes/tenderRoutes');
 
@@ -60,6 +60,9 @@ app.get('/api/health', (req, res) => {
 
 
 app.use('/api/tenders', tenderRoutes); // ← this is the base URL
+
+
+app.use('/api/bids', require('./routes/bidRoutes')); // Bid routes
 
 // Error handling middleware
 app.use(notFound);

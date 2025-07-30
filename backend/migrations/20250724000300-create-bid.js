@@ -43,6 +43,55 @@ module.exports = {
                 },
                 comment: 'Bid amount in the tender currency'
             },
+            proposedTimeline: {
+                type: Sequelize.STRING(255),
+                allowNull: true,
+                comment: 'Bidder\'s proposed implementation timeline'
+            },
+            companyName: {
+                type: Sequelize.STRING(255),
+                allowNull: true
+            },
+            contactPerson: {
+                type: Sequelize.STRING(255),
+                allowNull: true
+            },
+            email: {
+                type: Sequelize.STRING(255),
+                allowNull: true,
+                validate: {
+                    isEmail: true
+                }
+            },
+            phone: {
+                type: Sequelize.STRING(50),
+                allowNull: true
+            },
+            experience: {
+                type: Sequelize.TEXT,
+                allowNull: true
+            },
+            portfolio: {
+                type: Sequelize.STRING(255),
+                allowNull: true
+            },
+            certifications: {
+                type: Sequelize.TEXT,
+                allowNull: true
+            },
+            teamSize: {
+                type: Sequelize.INTEGER,
+                allowNull: true,
+                validate: {
+                    min: 1
+                }
+            },
+            methodology: {
+                type: Sequelize.TEXT,
+                allowNull: true
+            },
+
+
             currency: {
                 type: Sequelize.STRING(3),
                 allowNull: false,
@@ -173,11 +222,11 @@ module.exports = {
         await queryInterface.addIndex('bids', ['userId'], {
             name: 'bids_user_id_index'
         });
-        
+
         await queryInterface.addIndex('bids', ['tenderId'], {
             name: 'bids_tender_id_index'
         });
-        
+
         await queryInterface.addIndex('bids', ['status'], {
             name: 'bids_status_index'
         });
@@ -268,7 +317,7 @@ module.exports = {
                 console.log(`Index ${indexName} not found, skipping...`);
             }
         }
-        
+
         // Drop the table
         await queryInterface.dropTable('bids');
     },

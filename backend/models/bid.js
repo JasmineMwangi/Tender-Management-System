@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const Bid = sequelize.define('Bid', { // Using sequelize.define for consistency
+  const Bid = sequelize.define('Bid', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -10,7 +10,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DECIMAL(15, 2),
       allowNull: false
     },
-    proposal: {
+
+    proposedTimeline: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+
+    proposalDocument: {  // ✅ match database column
       type: DataTypes.TEXT,
       allowNull: false
     },
@@ -18,8 +24,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM('submitted', 'reviewed', 'qualified', 'rejected', 'awarded'),
       defaultValue: 'submitted'
     },
-    type: DataTypes.STRING,
-    bidderId: { // Match the foreign key name used in User model
+    type: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    userId: { // ✅ match actual DB field
       type: DataTypes.UUID,
       allowNull: false,
       references: {
@@ -27,7 +36,15 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id'
       }
     },
-    tenderId: { // Match the foreign key name used in Tender model
+    bidNumber: {
+      type: DataTypes.STRING,
+      allowNull: false,       // still required
+      unique: true            // optional but preferred
+    },
+
+
+
+    tenderId: {
       type: DataTypes.UUID,
       allowNull: false,
       references: {
@@ -37,22 +54,22 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
     paranoid: true,
-    deletedAt: 'deleted_at',
+    deletedAt: 'deletedAt',
     tableName: 'bids',
-    underscored: true
+    underscored: false
   });
 
   Bid.associate = models => {
-    Bid.belongsTo(models.User, { 
-      foreignKey: 'bidderId',
-      as: 'bidder' 
+    Bid.belongsTo(models.User, {
+      foreignKey: 'userId',
+      as: 'bidder' // alias remains okay
     });
-    Bid.belongsTo(models.Tender, { 
+    Bid.belongsTo(models.Tender, {
       foreignKey: 'tenderId',
-      as: 'tender' 
+      as: 'tender'
     });
   };
 

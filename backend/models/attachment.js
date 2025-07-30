@@ -1,10 +1,6 @@
 // models/attachment.js
-
-
 const BaseModel = require('./base-model');
 const bcrypt = require('bcryptjs');
-
-
 
 
 module.exports = (sequelize, DataTypes) => {

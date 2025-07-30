@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit3, Trash2, Eye, Search, Filter, Calendar,DollarSign,Building,Clock,
+import {
+  Plus, Edit3, Trash2, Eye, Search, Filter, Calendar, DollarSign, Building, Clock,
   CheckCircle, XCircle, AlertCircle
 } from 'lucide-react';
+import BidDialog from '../components/auth/BidDialog'; // Import the new component
+import { useAuth } from '../contexts/AuthContext'; // adjust path if needed
 
-import BidDialog from '../components/auth/BidDialog';
 
 const MyTenders = () => {
-
-  const [showBidDialog, setShowBidDialog] = useState(false);
-  const [selectedTender, setSelectedTender] = useState(null);
-
-  const handlePlaceBid = (tender) => {
-    setSelectedTender(tender);
-    setShowBidDialog(true);
-  };
-
+  const { user } = useAuth();
   const [tenders, setTenders] = useState([]);
   const [filteredTenders, setFilteredTenders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +17,12 @@ const MyTenders = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('create'); // 'create', 'edit', 'view'
+  const [selectedTender, setSelectedTender] = useState(null);
+
+  // Add bid dialog state
+  const [showBidDialog, setShowBidDialog] = useState(false);
+  const [bidTender, setBidTender] = useState(null);
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -47,7 +47,7 @@ const MyTenders = () => {
   // Filter tenders based on search and status
   useEffect(() => {
     let filtered = tenders;
-    
+
     if (searchTerm) {
       filtered = filtered.filter(tender =>
         tender.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -55,11 +55,11 @@ const MyTenders = () => {
         tender.category.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     if (statusFilter !== 'all') {
       filtered = filtered.filter(tender => tender.status === statusFilter);
     }
-    
+
     setFilteredTenders(filtered);
   }, [tenders, searchTerm, statusFilter]);
 
@@ -90,18 +90,65 @@ const MyTenders = () => {
     }
   };
 
+// Handle tender creation
+  const handleCreateTender = () => {
+  openModal('create'); // or navigate to a form page if you're using routing
+};
+   
+  // Handle bid submission
+  const handleSubmitBid = async (bidData) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${API_BASE_URL}/bids`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bidData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit bid');
+      }
+
+      const result = await response.json();
+      alert('Bid submitted successfully!');
+
+      // Optionally refresh tenders or update UI
+      // fetchMyTenders();
+
+      return result;
+    } catch (error) {
+      console.error('Error submitting bid:', error);
+      throw error;
+    }
+  };
+
+  // Open bid dialog
+  const openBidDialog = (tender) => {
+    setBidTender(tender);
+    setShowBidDialog(true);
+  };
+
+  // Close bid dialog
+  const closeBidDialog = () => {
+    setShowBidDialog(false);
+    setBidTender(null);
+  };
+
   // Handle form submission for create/update
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       const token = localStorage.getItem('authToken');
-      const url = modalType === 'create' 
+      const url = modalType === 'create'
         ? `${API_BASE_URL}/tenders`
         : `${API_BASE_URL}/tenders/${selectedTender._id}`;
-      
+
       const method = modalType === 'create' ? 'POST' : 'PUT';
-      
+
       const response = await fetch(url, {
         method: method,
         headers: {
@@ -116,15 +163,15 @@ const MyTenders = () => {
       }
 
       const updatedTender = await response.json();
-      
+
       if (modalType === 'create') {
         setTenders([...tenders, updatedTender]);
       } else {
-        setTenders(tenders.map(tender => 
+        setTenders(tenders.map(tender =>
           tender._id === selectedTender._id ? updatedTender : tender
         ));
       }
-      
+
       closeModal();
       alert(`Tender ${modalType === 'create' ? 'created' : 'updated'} successfully!`);
     } catch (err) {
@@ -162,7 +209,7 @@ const MyTenders = () => {
   const openModal = (type, tender = null) => {
     setModalType(type);
     setSelectedTender(tender);
-    
+
     if (type === 'create') {
       setFormData({
         title: '',
@@ -190,7 +237,7 @@ const MyTenders = () => {
         status: tender.status || 'draft'
       });
     }
-    
+
     setShowModal(true);
   };
 
@@ -218,10 +265,10 @@ const MyTenders = () => {
       closed: { icon: XCircle, color: 'bg-red-100 text-red-800', text: 'Closed' },
       pending: { icon: Clock, color: 'bg-yellow-100 text-yellow-800', text: 'Pending' }
     };
-    
+
     const config = statusConfig[status] || statusConfig.draft;
     const Icon = config.icon;
-    
+
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
         <Icon className="w-3 h-3 mr-1" />
@@ -265,13 +312,17 @@ const MyTenders = () => {
               <h1 className="text-3xl font-bold text-gray-900">My Tenders</h1>
               <p className="text-gray-600 mt-1">Manage your tender submissions and track their progress</p>
             </div>
-            <button
-              onClick={() => openModal('create')}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              Create New Tender
-            </button>
+
+            {user?.role === 'organization' && (
+              <button
+                onClick={handleCreateTender}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm transition-colors"
+              >
+                + Create New Tender
+              </button>
+            )}
+
+
           </div>
 
           {/* Search and Filter */}
@@ -311,83 +362,85 @@ const MyTenders = () => {
           </div>
         )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTenders.map((tender) => (
-              <div key={tender._id} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-                <div className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-xl font-semibold text-gray-900 line-clamp-2">{tender.title}</h3>
-              {getStatusBadge(tender.status)}
-            </div>
-            
-            <p className="text-gray-600 mb-4 line-clamp-3">{tender.description}</p>
-            
-            <div className="space-y-2 mb-4">
-              <div className="flex items-center text-sm text-gray-500">
-                <Building className="w-4 h-4 mr-2" />
-                {tender.category}
-              </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <DollarSign className="w-4 h-4 mr-2" />
-                {formatCurrency(tender.budget)}
-              </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <Calendar className="w-4 h-4 mr-2" />
-                Deadline: {formatDate(tender.deadline)}
-              </div>
-            </div>
-            
-            <div className="flex gap-2 mb-2">
-              <button
-                onClick={() => openModal('view', tender)}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
-              >
-                <Eye className="w-4 h-4" />
-                View
-              </button>
-              <button
-                onClick={() => openModal('edit', tender)}
-                className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
-              >
-                <Edit3 className="w-4 h-4" />
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(tender._id)}
-                className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
-              >
-                <Trash2 className="w-4 h-4" />
-                Delete
-              </button>
-            </div>
-
-            <button 
-              onClick={() => handlePlaceBid(tender)}
-              className="w-full bg-green-100 hover:bg-green-200 text-green-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Place Bid
-            </button>
+        {/* Tenders Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTenders.map((tender) => (
+            <div key={tender._id} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-xl font-semibold text-gray-900 line-clamp-2">{tender.title}</h3>
+                  {getStatusBadge(tender.status)}
                 </div>
+
+                <p className="text-gray-600 mb-4 line-clamp-3">{tender.description}</p>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Building className="w-4 h-4 mr-2" />
+                    {tender.category}
+                  </div>
+                  <div className="flex items-center text-sm text-gray-500">
+                    <DollarSign className="w-4 h-4 mr-2" />
+                    {formatCurrency(tender.budget)}
+                  </div>
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Deadline: {formatDate(tender.deadline)}
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openModal('view', tender)}
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View
+                  </button>
+                  <button
+                    onClick={() => openModal('edit', tender)}
+                    className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(tender._id)}
+                    className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </button>
+                </div>
+
+                {/* Place Bid Button - Only show for published tenders */}
+                {user?.role === 'bidder' && tender.status === 'published' && (
+                  <button
+                    onClick={() => openBidDialog(tender)}
+                    className="w-full mt-3 bg-green-100 hover:bg-green-200 text-green-700 py-2 px-3 rounded-md flex items-center justify-center gap-1 text-sm transition-colors"
+                  >
+                    <DollarSign className="w-4 h-4" />
+                    Place Bid
+                  </button>
+                )}
+                {tender.status === 'closed' && (
+                  <div className="mt-3 text-sm text-gray-500">
+                    <Clock className="inline-block w-4 h-4 mr-1" />
+                    Tender is closed
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
 
-          {/* Bid Dialog */}
-          {showBidDialog && selectedTender && (
-            <BidDialog
-              tender={selectedTender}
-              onClose={() => setShowBidDialog(false)}
-            />
-          )}
-
-          {/* Empty State */}
+        {/* Empty State */}
         {filteredTenders.length === 0 && !loading && (
           <div className="text-center py-12">
             <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No tenders found</h3>
             <p className="text-gray-500 mb-6">
-              {searchTerm || statusFilter !== 'all' 
+              {searchTerm || statusFilter !== 'all'
                 ? 'Try adjusting your search or filter criteria'
                 : 'Get started by creating your first tender'
               }
@@ -404,7 +457,7 @@ const MyTenders = () => {
           </div>
         )}
 
-        {/* Modal */}
+        {/* Modal for Create/Edit/View */}
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg max-w-2xl w-full max-h-screen overflow-y-auto">
@@ -643,6 +696,14 @@ const MyTenders = () => {
             </div>
           </div>
         )}
+
+        {/* Bid Dialog */}
+        <BidDialog
+          isOpen={showBidDialog}
+          onClose={closeBidDialog}
+          tender={bidTender}
+          onSubmitBid={handleSubmitBid}
+        />
       </div>
     </div>
   );
