@@ -105,7 +105,10 @@ exports.createBid = async (req, res) => {
 exports.getAllBids = async (req, res) => {
   try {
     const bids = await Bid.findAll();
-    return res.status(200).json({ success: true, data: bids });
+    // return res.status(200).json({ success: true, data: bids });
+
+        return res.status(200).json(bids);
+
   } catch (error) {
     console.error('Error fetching bids:', error);
     return res.status(500).json({
@@ -115,6 +118,28 @@ exports.getAllBids = async (req, res) => {
     });
   }
 };
+
+// Get Bids by User ID
+exports.getBidsByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const bids = await Bid.findAll({
+      where: { userId: userId }
+    });
+
+    return res.status(200).json({ success: true, data: bids });
+  } catch (error) {
+    console.error('Error fetching bids by userId:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+
+
 
 // Get Bid by ID
 exports.getBidById = async (req, res) => {

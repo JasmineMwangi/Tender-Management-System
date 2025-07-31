@@ -172,7 +172,7 @@ module.exports = (sequelize, DataTypes) => {
     
     if (models.Bid) {
       User.hasMany(models.Bid, { 
-        foreignKey: 'bidderId', // Adjust based on your Bid model
+        foreignKey: 'userId', // Adjust based on your Bid model
         as: 'bids'
       });
     }

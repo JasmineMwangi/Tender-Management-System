@@ -61,7 +61,6 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/tenders', tenderRoutes); // ← this is the base URL
 
-
 app.use('/api/bids', require('./routes/bidRoutes')); // Bid routes
 
 // Error handling middleware

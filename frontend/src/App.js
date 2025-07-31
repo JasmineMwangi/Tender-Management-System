@@ -10,6 +10,7 @@ import BidderRegister from './components/auth/BidderRegister';
 import OrganizationRegister from './components/auth/OrganizationRegister';
 import Dashboard from './pages/Dashboard';
 import MyTenders from './pages/Mytenders';
+import BidList from './pages/BidList';
 import './App.css';
 
 // Dummy placeholders - replace with actual components as you build them
@@ -31,14 +32,14 @@ const TenderCreate = () => (
   </div>
 );
 
-const BidList = () => (
-  <div className="p-6">
-    <h1 className="text-2xl font-bold text-gray-900 mb-4">💼 Bid List</h1>
-    <div className="bg-white rounded-lg shadow p-6">
-      <p className="text-gray-600">Bid List component - Coming Soon</p>
-    </div>
-  </div>
-);
+// const BidList = () => (
+//   <div className="p-6">
+//     <h1 className="text-2xl font-bold text-gray-900 mb-4">💼 Bid List</h1>
+//     <div className="bg-white rounded-lg shadow p-6">
+//       <p className="text-gray-600">Bid List component - Coming Soon</p>
+//     </div>
+//   </div>
+// );
 
 const UserList = () => (
   <div className="p-6">
@@ -85,6 +86,10 @@ function App() {
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register/bidder" element={<BidderRegister />} />
             <Route path="/register/organization" element={<OrganizationRegister />} />
+            {/* add bidList */}
+            <Route path="/my-bids" element={<BidList />} />
+            
+            {/* 🔒 Protected Routes */}
             <Route path="/unauthorized" element={<Unauthorized />} />
             
             {/* ✅ Protected Routes under /app */}
