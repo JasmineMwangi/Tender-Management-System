@@ -8,7 +8,7 @@ const Sidebar = ({ userRole }) => {
   const getMenuItems = () => {
     const commonItems = [
       { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-      { path: '/app/my-tenders', label: 'My Tenders', icon: '📋' },
+      { path: '/app/my-tenders', label: 'Tenders', icon: '📋' },
 
     ];
 

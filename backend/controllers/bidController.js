@@ -1,4 +1,5 @@
-const { Bid } = require('../models');
+// Import all required models
+const { Bid, Tender, User, Organisation } = require('../models');
 const { v4: uuidv4 } = require('uuid');
 
 // Auto-generate a unique bid number
@@ -101,16 +102,71 @@ exports.createBid = async (req, res) => {
   }
 };
 
-// Get all Bids
+
+
+
+// Get all Bids with tender and user information
 exports.getAllBids = async (req, res) => {
   try {
-    const bids = await Bid.findAll();
-    // return res.status(200).json({ success: true, data: bids });
+    const bids = await Bid.findAll({
+      include: [
+        {
+          model: Tender,
+          as: 'tender', // ✅ lowercase 'tender'
+          attributes: [
+            'id',
+            'title',
+            'description',
+            'category',
+            'budget',
+            'deadline',
+            'requirements',
+            'contactEmail',
+            'contactPhone',
+            'location',
+            'status',
+            'createdAt'
+          ],
+          include: [
+            {
+              model: User,
+              as: 'organisation', // ✅ this alias is correct in Tender.associate
+              attributes: ['name', 'email']
+            }
+          ]
+        },
+        {
+          model: User,
+          as: 'user', // ✅ matches Bid.associate
+          attributes: ['id', 'name']
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
 
-        return res.status(200).json(bids);
-
+    return res.status(200).json(bids);
   } catch (error) {
-    console.error('Error fetching bids:', error);
+    console.error('Error fetching bids with tender:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+      error: error.message,
+    });
+  }
+};
+
+
+// Alternative: Simple getAllBids without includes (for testing)
+exports.getAllBidsSimple = async (req, res) => {
+  try {
+    const bids = await Bid.findAll({
+      order: [['createdAt', 'DESC']]
+    });
+
+    console.log('Fetched simple bids:', JSON.stringify(bids, null, 2));
+    return res.status(200).json(bids);
+  } catch (error) {
+    console.error('Error fetching simple bids:', error);
     return res.status(500).json({
       success: false,
       message: 'Internal Server Error',
@@ -125,7 +181,32 @@ exports.getBidsByUserId = async (req, res) => {
     const { userId } = req.params;
 
     const bids = await Bid.findAll({
-      where: { userId: userId }
+      where: { userId: userId },
+      include: [
+        {
+          model: Tender,
+          as: 'tender',
+          attributes: [
+            'id',
+            'title',
+            'description',
+            'category',
+            'budget',
+            'deadline',
+            'requirements',
+            'location',
+            'status'
+          ],
+          include: [
+            {
+              model: Organisation,
+              as: 'organisation',
+              attributes: ['id', 'name', 'email']
+            }
+          ]
+        }
+      ],
+      order: [['createdAt', 'DESC']]
     });
 
     return res.status(200).json({ success: true, data: bids });
@@ -139,16 +220,34 @@ exports.getBidsByUserId = async (req, res) => {
   }
 };
 
-
-
 // Get Bid by ID
 exports.getBidById = async (req, res) => {
   try {
     const { id } = req.params;
-    const bid = await Bid.findByPk(id);
+    const bid = await Bid.findByPk(id, {
+      include: [
+        {
+          model: Tender,
+          as: 'tender',
+          include: [
+            {
+              model: Organisation,
+              as: 'organisation'
+            }
+          ]
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'name', 'email']
+        }
+      ]
+    });
+    
     if (!bid) {
       return res.status(404).json({ success: false, message: 'Bid not found' });
     }
+    
     return res.status(200).json({ success: true, data: bid });
   } catch (error) {
     console.error('Error fetching bid:', error);

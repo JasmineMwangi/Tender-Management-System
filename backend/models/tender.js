@@ -36,7 +36,6 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'tenders',
     underscored: false, // Use camelCase for model attributes
   });
-
   Tender.associate = models => {
     Tender.belongsTo(models.User, { 
       foreignKey: 'organisationId', 

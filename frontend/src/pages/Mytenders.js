@@ -309,7 +309,7 @@ const MyTenders = () => {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">My Tenders</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Tenders</h1>
               <p className="text-gray-600 mt-1">Manage your tender submissions and track their progress</p>
             </div>
 

@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     paranoid: true,
     underscored: false
   });
+  
 
 //   Organization.hasMany(Tender, { foreignKey: 'organization_id' });
 // Tender.belongsTo(Organization, { foreignKey: 'organization_id' });

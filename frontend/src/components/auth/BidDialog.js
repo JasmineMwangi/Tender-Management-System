@@ -22,7 +22,8 @@ const BidDialog = ({
     portfolio: '',
     certifications: '',
     teamSize: '',
-    methodology: ''
+    methodology: '',
+    // tenderId: tender.id
   });
 
   const [errors, setErrors] = useState({});
@@ -106,7 +107,9 @@ const BidDialog = ({
     try {
       // Call the parent component's submit handler
       await onSubmitBid({
-        tenderId: tender._id,
+        tenderId: tender.id,
+      
+
         ...bidData,
         submittedAt: new Date().toISOString()
       });

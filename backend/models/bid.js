@@ -65,8 +65,9 @@ module.exports = (sequelize, DataTypes) => {
   Bid.associate = models => {
     Bid.belongsTo(models.User, {
       foreignKey: 'userId',
-      as: 'bidder' // alias remains okay
+      as: 'user' // alias remains okay
     });
+    
     Bid.belongsTo(models.Tender, {
       foreignKey: 'tenderId',
       as: 'tender'
