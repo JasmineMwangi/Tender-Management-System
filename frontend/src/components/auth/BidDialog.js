@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
-  X, DollarSign, Calendar, FileText, User, Phone, Mail, 
-  Building, Upload, AlertCircle, CheckCircle, Clock
+  X, DollarSign, Calendar, User, Phone, Mail, 
+  Building, AlertCircle, CheckCircle, Clock
 } from 'lucide-react';
 
 const BidDialog = ({ 
@@ -108,8 +108,8 @@ const BidDialog = ({
       // Call the parent component's submit handler
       await onSubmitBid({
         tenderId: tender.id,
+        // userId: user.id,
       
-
         ...bidData,
         submittedAt: new Date().toISOString()
       });

@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import MyTenders from './pages/Mytenders';
 import BidList from './pages/BidList';
 import './App.css';
+import ReceivedBids from './pages/ReceivedBids';
 
 // Dummy placeholders - replace with actual components as you build them
 const TenderList = () => (
@@ -88,13 +89,14 @@ function App() {
             <Route path="/register/organization" element={<OrganizationRegister />} />
             {/* add bidList */}
             <Route path="/my-bids" element={<BidList />} />
-            
+            {/* <Route path="/app/bids/received" element={<ReceivedBids />} /> */}
+
             {/* 🔒 Protected Routes */}
             <Route path="/unauthorized" element={<Unauthorized />} />
-            
+
             {/* ✅ Protected Routes under /app */}
-            <Route 
-              path="/app" 
+            <Route
+              path="/app"
               element={
                 <ProtectedRoute>
                   <Layout />
@@ -103,80 +105,90 @@ function App() {
             >
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
-              
+
               {/* 🔐 Admin Only Routes */}
-              <Route 
-                path="users" 
+              <Route
+                path="users"
                 element={
                   <ProtectedRoute roles={['admin']}>
                     <UserList />
                   </ProtectedRoute>
-                } 
+                }
               />
-              <Route 
-                path="reports" 
+              <Route
+                path="reports"
                 element={
                   <ProtectedRoute roles={['admin']}>
                     <Reports />
                   </ProtectedRoute>
-                } 
+                }
               />
-              
+
               {/* 🏢 Procuring Entity Routes */}
-              <Route 
-                path="my-tenders" 
+              <Route
+                path="my-tenders"
                 element={
-                 <ProtectedRoute role={['organisation']}>
+                  <ProtectedRoute role={['organisation']}>
                     <MyTenders />
                   </ProtectedRoute>
-                } 
+                }
               />
-              <Route 
-                path="tender/create" 
+
+              <Route
+                path="bids/received"
                 element={
-                  <ProtectedRoute roles={['procuring_entity']}>
+                  <ProtectedRoute>
+                    <ReceivedBids />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="tender/create"
+                element={
+                  <ProtectedRoute >
                     <TenderCreate />
                   </ProtectedRoute>
-                } 
+                }
               />
-              
+
               {/* 👤 Bidder Routes */}
-              <Route 
-                path="available-tenders" 
+              <Route
+                path="available-tenders"
                 element={
                   <ProtectedRoute roles={['bidder']}>
                     <TenderList />
                   </ProtectedRoute>
-                } 
+                }
               />
-              <Route 
-                path="my-bids" 
+              <Route
+                path="my-bids"
                 element={
                   <ProtectedRoute roles={['bidder']}>
                     <BidList />
                   </ProtectedRoute>
-                } 
+                }
               />
-              
+
               {/* 🔄 Shared Routes */}
-              <Route 
-                path="tenders" 
+              <Route
+                path="tenders"
                 element={
-                  <ProtectedRoute roles={['admin', 'procuring_entity']}>
+                  <ProtectedRoute roles={['admin', 'organisation']}>
                     <TenderList />
                   </ProtectedRoute>
-                } 
+                }
               />
-              <Route 
-                path="bids" 
+              <Route
+                path="bids"
                 element={
-                  <ProtectedRoute roles={['admin', 'procuring_entity']}>
+                  <ProtectedRoute roles={['admin', 'organisation']}>
                     <BidList />
                   </ProtectedRoute>
-                } 
+                }
               />
             </Route>
-            
+
             {/* 🚫 Catch all route - redirect to home */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

@@ -1,27 +1,23 @@
 // backend/server.js
-// const dotenv = require('dotenv');
-const cookieParser = require('cookie-parser');
+require('dotenv').config();
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const path = require('path');
-const { errorHandler, notFound } = require('./middlewares/errorMiddleware');
-const { connectDB } = require('./config/database');require('dotenv').config();
 const listEndpoints = require('express-list-endpoints');
-const { registerBidder } = require('./controllers/authController');
-//const bidController = require('../controllers/bidController');
-// const tenderRoutes = require('./routes/tenderRoutes');
+const { errorHandler, notFound } = require('./middlewares/errorMiddleware');
+const { connectDB, sequelize } = require('./config/database');
+
 const tenderRoutes = require('./routes/tenderRoutes');
+const bidRoutes = require('./routes/bidRoutes');
+const authRoutes = require('./routes/auth');
 
 const app = express();
-const { sequelize } = require('./config/database');
 
-const logger = require('./utils/logger');
-
-
-// Security middleware
+// ------------------- Security Middleware -------------------
 app.use(helmet());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -29,60 +25,48 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
-// Rate limiting
+// ------------------- Rate Limiting -------------------
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 100 // limit each IP
 });
 app.use('/api/', limiter);
 
-// Body parsing middleware
+// ------------------- Body Parsing -------------------
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Logging
+// ------------------- Logging -------------------
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// Static files
+// ------------------- Static Files -------------------
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
-//app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/auth', require('./routes/auth'));
+// ------------------- Routes -------------------
+app.use('/api/auth', authRoutes);
+app.use('/api/tenders', tenderRoutes);
+app.use('/api/bids', bidRoutes); // ✅ No hardcoded /api/bids inside bidRoutes
 
-
-// Health check
+// ------------------- Health Check -------------------
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-
-app.use('/api/tenders', tenderRoutes); // ← this is the base URL
-
-app.use('/api/bids', require('./routes/bidRoutes')); // Bid routes
-
-// Error handling middleware
+// ------------------- Error Handling -------------------
 app.use(notFound);
 app.use(errorHandler);
 
+// ------------------- Start Server -------------------
 const PORT = process.env.PORT || 5000;
 
-// Database connection and server start
 const startServer = async () => {
   try {
     await connectDB();
+    await sequelize.sync({ force: true, logging: console.log }); // change to { alter: true } in production
 
-
-
-    // Sync models with DB structure
-    // await sequelize.sync({ alter: true, logging: console.log });
-    await sequelize.sync({ force: true, logging: console.log });
-
-
-      // ✅ Log available routes
-    console.table(listEndpoints(app));
+    console.table(listEndpoints(app)); // ✅ Log available routes
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
@@ -91,8 +75,5 @@ const startServer = async () => {
     process.exit(1);
   }
 };
-
-
-
 
 startServer();
