@@ -118,6 +118,359 @@ exports.updateBid = async (req, res) => {
   }
 };
 
+// Add these methods to your existing bidController.js
+
+// Get bid history for a specific user (bidder)
+exports.getBidHistory = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { 
+      page = 1, 
+      limit = 10, 
+      status = 'all',
+      category = 'all',
+      dateFrom,
+      dateTo,
+      sortBy = 'submittedAt',
+      sortOrder = 'desc'
+    } = req.query;
+
+    const offset = (page - 1) * limit;
+    const whereConditions = { userId };
+
+    // Add status filter
+    if (status !== 'all') {
+      whereConditions.status = status;
+    }
+
+    // Add date range filter
+    if (dateFrom || dateTo) {
+      whereConditions.submittedAt = {};
+      if (dateFrom) whereConditions.submittedAt[Op.gte] = new Date(dateFrom);
+      if (dateTo) whereConditions.submittedAt[Op.lte] = new Date(dateTo);
+    }
+
+    // Tender category filter
+    const tenderWhere = {};
+    if (category !== 'all') {
+      tenderWhere.category = category;
+    }
+
+    const { count, rows: bidHistory } = await Bid.findAndCountAll({
+      where: whereConditions,
+      include: [
+        {
+          model: Tender,
+          as: 'tender',
+          where: Object.keys(tenderWhere).length ? tenderWhere : undefined,
+          attributes: [
+            'id', 'title', 'description', 'category', 'budget', 
+            'deadline', 'status', 'location', 'requirements'
+          ],
+          include: [
+            {
+              model: Organisation,
+              as: 'organisation',
+              attributes: ['id', 'name', 'email', 'phone']
+            }
+          ]
+        }
+      ],
+      order: [[sortBy, sortOrder.toUpperCase()]],
+      limit: parseInt(limit),
+      offset: offset
+    });
+
+    const totalPages = Math.ceil(count / limit);
+
+    return res.status(200).json({
+      success: true,
+      data: bidHistory,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching bid history:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+      error: error.message
+    });
+  }
+};
+
+// Get bid history statistics for dashboard
+exports.getBidHistoryStats = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Get overall statistics
+    const totalBids = await Bid.count({ where: { userId } });
+    
+    const statusStats = await Bid.findAll({
+      where: { userId },
+      attributes: [
+        'status',
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
+      ],
+      group: ['status'],
+      raw: true
+    });
+
+    // Get success rate (accepted bids / total bids)
+    const acceptedBids = await Bid.count({ 
+      where: { userId, status: 'accepted' } 
+    });
+    const successRate = totalBids > 0 ? ((acceptedBids / totalBids) * 100).toFixed(1) : 0;
+
+    // Get average bid amount
+    const avgBidAmount = await Bid.findOne({
+      where: { userId },
+      attributes: [
+        [Sequelize.fn('AVG', Sequelize.col('amount')), 'avgAmount']
+      ],
+      raw: true
+    });
+
+    // Get recent activity (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const recentActivity = await Bid.count({
+      where: {
+        userId,
+        submittedAt: { [Op.gte]: thirtyDaysAgo }
+      }
+    });
+
+    // Format status statistics
+    const formattedStats = {
+      total: totalBids,
+      pending: 0,
+      under_review: 0,
+      accepted: 0,
+      rejected: 0,
+      successRate: parseFloat(successRate),
+      avgBidAmount: parseFloat(avgBidAmount?.avgAmount || 0),
+      recentActivity
+    };
+
+    statusStats.forEach(stat => {
+      if (formattedStats.hasOwnProperty(stat.status)) {
+        formattedStats[stat.status] = parseInt(stat.count);
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: formattedStats
+    });
+  } catch (error) {
+    console.error('Error fetching bid history stats:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+      error: error.message
+    });
+  }
+};
+
+// Get detailed bid information by ID (for bidder view)
+exports.getBidDetailsForBidder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.query; // Ensure bidder can only see their own bids
+
+    const bid = await Bid.findOne({
+      where: { id, userId }, // Security check
+      include: [
+        {
+          model: Tender,
+          as: 'tender',
+          attributes: [
+            'id', 'title', 'description', 'category', 'budget', 
+            'deadline', 'status', 'location', 'requirements', 'createdAt'
+          ],
+          include: [
+            {
+              model: Organisation,
+              as: 'organisation',
+              attributes: ['id', 'name', 'email', 'phone', 'website']
+            }
+          ]
+        }
+      ]
+    });
+
+    if (!bid) {
+      return res.status(404).json({
+        success: false,
+        message: 'Bid not found or access denied'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: bid
+    });
+  } catch (error) {
+    console.error('Error fetching bid details:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+      error: error.message
+    });
+  }
+};
+
+// Withdraw a pending bid
+exports.withdrawBid = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId, reason } = req.body;
+
+    const bid = await Bid.findOne({
+      where: { id, userId } // Security check
+    });
+
+    if (!bid) {
+      return res.status(404).json({
+        success: false,
+        message: 'Bid not found or access denied'
+      });
+    }
+
+    // Check if bid can be withdrawn (only pending bids)
+    if (bid.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'Only pending bids can be withdrawn'
+      });
+    }
+
+    // Update bid status to withdrawn
+    await bid.update({
+      status: 'withdrawn',
+      withdrawnAt: new Date(),
+      withdrawalReason: reason || 'Withdrawn by bidder',
+      updatedAt: new Date()
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Bid withdrawn successfully',
+      data: bid
+    });
+  } catch (error) {
+    console.error('Error withdrawing bid:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+      error: error.message
+    });
+  }
+};
+
+// Get bid timeline/activity log
+exports.getBidTimeline = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.query;
+
+    const bid = await Bid.findOne({
+      where: { id, userId },
+      include: [
+        {
+          model: Tender,
+          as: 'tender',
+          attributes: ['title']
+        }
+      ]
+    });
+
+    if (!bid) {
+      return res.status(404).json({
+        success: false,
+        message: 'Bid not found or access denied'
+      });
+    }
+
+    // Create timeline events
+    const timeline = [
+      {
+        id: 1,
+        event: 'Bid Submitted',
+        description: `Your bid of ${new Intl.NumberFormat('en-KE', { style: 'currency', currency: bid.currency || 'KES' }).format(bid.amount)} was submitted`,
+        timestamp: bid.submittedAt,
+        status: 'completed',
+        icon: 'send'
+      }
+    ];
+
+    if (bid.reviewedAt) {
+      timeline.push({
+        id: 2,
+        event: 'Under Review',
+        description: 'Your bid is being evaluated by the organization',
+        timestamp: bid.reviewedAt,
+        status: bid.status === 'under_review' ? 'current' : 'completed',
+        icon: 'eye'
+      });
+    }
+
+    if (bid.status === 'accepted') {
+      timeline.push({
+        id: 3,
+        event: 'Bid Accepted',
+        description: 'Congratulations! Your bid has been accepted',
+        timestamp: bid.updatedAt,
+        status: 'completed',
+        icon: 'check-circle'
+      });
+    } else if (bid.status === 'rejected') {
+      timeline.push({
+        id: 3,
+        event: 'Bid Rejected',
+        description: 'Unfortunately, your bid was not selected',
+        timestamp: bid.updatedAt,
+        status: 'completed',
+        icon: 'x-circle'
+      });
+    } else if (bid.status === 'withdrawn') {
+      timeline.push({
+        id: 3,
+        event: 'Bid Withdrawn',
+        description: bid.withdrawalReason || 'Bid was withdrawn',
+        timestamp: bid.withdrawnAt,
+        status: 'completed',
+        icon: 'arrow-left'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        bid: bid,
+        timeline: timeline.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching bid timeline:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+      error: error.message
+    });
+  }
+};
+
+
 // Get bids by user ID
 exports.getBidsByUserId = async (req, res) => {
   try {
