@@ -13,6 +13,39 @@ const generateToken = (user) => {
   });
 };
 
+exports.registerAdmin = async (req, res) => {
+  const { name, email, phone, password } = req.body;
+
+  try {
+    const existing = await User.findOne({ where: { email } });
+    if (existing) {
+      return res.status(400).json({ message: 'Email already in use' });
+    }
+
+    console.log('🧪 User Model Attributes:', User.getAttributes());
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      id: uuidv4(), // ensure unique ID
+      name,
+      email,
+      phone,
+      password: hashedPassword,
+      role: 'admin', // force admin role
+      status: 'active',
+      emailVerified: 0
+    });
+
+    const token = generateToken(user);
+    res.status(201).json({ token, user });
+  } catch (error) {
+    console.error('❌ Admin Registration Error:', error);
+    res.status(500).json({ message: 'Registration failed', error: error.message });
+  }
+};
+
+
+
 // POST /api/auth/register/bidder
 // exports.registerBidder = async (req, res) => {
 //   const { name, email, phone, password } = req.body;

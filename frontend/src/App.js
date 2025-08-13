@@ -8,11 +8,13 @@ import LandingPage from './components/auth/LandingPage';
 import LoginForm from './components/auth/LoginForm';
 import BidderRegister from './components/auth/BidderRegister';
 import OrganizationRegister from './components/auth/OrganizationRegister';
+import AdminRegister from './components/auth/AdminRegister';
 import Dashboard from './pages/Dashboard';
 import MyTenders from './pages/Mytenders';
 import BidList from './pages/BidList';
 import './App.css';
 import ReceivedBids from './pages/ReceivedBids';
+import BidHistory from './pages/BidHistory'; 
 
 // Dummy placeholders - replace with actual components as you build them
 const TenderList = () => (
@@ -87,6 +89,8 @@ function App() {
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register/bidder" element={<BidderRegister />} />
             <Route path="/register/organization" element={<OrganizationRegister />} />
+            <Route path="/register/admin"element={<AdminRegister/> }/>
+
             {/* add bidList */}
             <Route path="/my-bids" element={<BidList />} />
             {/* <Route path="/app/bids/received" element={<ReceivedBids />} /> */}
@@ -142,6 +146,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              
 
               <Route
                 path="tender/create"
@@ -169,7 +174,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-
+                <Route
+                path="bid-history"
+                element={
+                  <ProtectedRoute>
+                  <BidHistory />
+                  </ProtectedRoute>
+                }
+                />
               {/* 🔄 Shared Routes */}
               <Route
                 path="tenders"

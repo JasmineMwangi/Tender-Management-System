@@ -7,9 +7,8 @@ const Sidebar = ({ userRole }) => {
 
   const getMenuItems = () => {
     const commonItems = [
-      { path: '/dashboard', label: 'Dashboard', icon: '📊' },
+      { path: '/app/dashboard', label: 'Dashboard', icon: '📊' },
       { path: '/app/my-tenders', label: 'Tenders', icon: '📋' },
-
     ];
 
     const roleBasedItems = {
@@ -20,13 +19,10 @@ const Sidebar = ({ userRole }) => {
         { path: '/app/reports', label: 'Reports', icon: '📈' }
       ],
       organization: [
-        // { path: '/app/my-tenders', label: 'My Tenders', icon: '📋' },
         { path: '/app/tender/create', label: 'Create Tender', icon: '➕' },
         { path: '/app/bids/received', label: 'Received Bids', icon: '📥' },
-        //{ path: '/app/reports', label: 'reports', icon: '📈' }
       ],
       bidder: [
-        // { path: '/app/available-tenders', label: 'Available Tenders', icon: '🔍' },
         { path: '/app/my-bids', label: 'My Bids', icon: '📝' },
         { path: '/app/bid-history', label: 'Bid History', icon: '📜' }
       ]
@@ -38,15 +34,21 @@ const Sidebar = ({ userRole }) => {
   const menuItems = getMenuItems();
 
   return (
-    <aside className="sidebar">
-      <ul className="sidebar-nav">
+    // CHANGED: Added Tailwind-like fixed positioning and full height
+    <aside 
+      className="sidebar fixed top-0 left-0 h-full shadow-lg" // CHANGED
+      style={{ width: '240px', backgroundColor: '#1f2937', color: '#fff' }} // CHANGED: Added inline style for width + bg color
+    >
+      <ul className="sidebar-nav p-4"> {/* CHANGED: Added padding */}
         {menuItems.map((item) => (
-          <li key={item.path}>
+          <li key={item.path} className="mb-2"> {/* CHANGED: Added margin between links */}
             <Link
               to={item.path}
-              className={location.pathname === item.path ? 'active' : ''}
+              className={`flex items-center p-2 rounded hover:bg-gray-700 transition ${
+                location.pathname === item.path ? 'bg-gray-800 font-bold' : ''
+              }`} // CHANGED: Added flex, hover effects, and active style
             >
-              <span className="icon">{item.icon}</span>
+              <span className="mr-2">{item.icon}</span>
               {item.label}
             </Link>
           </li>

@@ -82,6 +82,22 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
+const registerAdmin = async (data) => {
+  try {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    const response = await axios.post('/api/auth/register/admin', data);
+    dispatch({ type: 'LOGIN_SUCCESS', payload: response.data });
+    return response.data;
+  } catch (error) {
+    dispatch({
+      type: 'LOGIN_FAIL',
+      payload: error.response?.data?.message || 'Admin registration failed'
+    });
+    throw error;
+  }
+};
+
+
 
   const registerBidder = async (data) => {
     try {
@@ -138,6 +154,7 @@ export const AuthProvider = ({ children }) => {
       register,
       registerBidder,
       registerOrganization,
+      registerAdmin,
       logout,
       clearError
     }}>

@@ -5,7 +5,7 @@ const authController = require('../controllers/authController');
 const { authenticate } = require('../middlewares/authenticate');
 const { protect } = require('../middlewares/authMiddleware');
 
-const {registerBidder,registerOrganization,login,logout,} = require('../controllers/authController');
+const {registerBidder,registerOrganization,registerAdmin,login,logout,} = require('../controllers/authController');
 
 
 // router.post('/register', authController.register);
@@ -13,6 +13,7 @@ const {registerBidder,registerOrganization,login,logout,} = require('../controll
 // router.get('/protected', protect, authController.protectedRoute);
 router.post('/register/bidder', registerBidder);
 router.post('/register/organization', registerOrganization);
+router.post('/register/admin', registerAdmin);
 router.post('/login', login);
 router.post('/logout', logout);
 
