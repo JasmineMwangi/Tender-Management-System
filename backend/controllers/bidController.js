@@ -124,9 +124,9 @@ exports.updateBid = async (req, res) => {
 exports.getBidHistory = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { 
-      page = 1, 
-      limit = 10, 
+    const {
+      page = 1,
+      limit = 10,
       status = 'all',
       category = 'all',
       dateFrom,
@@ -164,7 +164,7 @@ exports.getBidHistory = async (req, res) => {
           as: 'tender',
           where: Object.keys(tenderWhere).length ? tenderWhere : undefined,
           attributes: [
-            'id', 'title', 'description', 'category', 'budget', 
+            'id', 'title', 'description', 'category', 'budget',
             'deadline', 'status', 'location', 'requirements'
           ],
           include: [
@@ -212,7 +212,7 @@ exports.getBidHistoryStats = async (req, res) => {
 
     // Get overall statistics
     const totalBids = await Bid.count({ where: { userId } });
-    
+
     const statusStats = await Bid.findAll({
       where: { userId },
       attributes: [
@@ -224,8 +224,8 @@ exports.getBidHistoryStats = async (req, res) => {
     });
 
     // Get success rate (accepted bids / total bids)
-    const acceptedBids = await Bid.count({ 
-      where: { userId, status: 'accepted' } 
+    const acceptedBids = await Bid.count({
+      where: { userId, status: 'accepted' }
     });
     const successRate = totalBids > 0 ? ((acceptedBids / totalBids) * 100).toFixed(1) : 0;
 
@@ -241,7 +241,7 @@ exports.getBidHistoryStats = async (req, res) => {
     // Get recent activity (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
+
     const recentActivity = await Bid.count({
       where: {
         userId,
@@ -294,7 +294,7 @@ exports.getBidDetailsForBidder = async (req, res) => {
           model: Tender,
           as: 'tender',
           attributes: [
-            'id', 'title', 'description', 'category', 'budget', 
+            'id', 'title', 'description', 'category', 'budget',
             'deadline', 'status', 'location', 'requirements', 'createdAt'
           ],
           include: [
@@ -505,6 +505,37 @@ exports.getBidsByUserId = async (req, res) => {
     });
   }
 };
+// Get bids for a specific tender for organization
+exports.getReceivedBids = async (req, res) => {
+  try {
+    if (req.user.role !== 'organisation') {
+      return res.status(403).json({ success: false, message: 'Access denied' });
+    }
+
+    const bids = await Bid.findAll({
+      include: [
+        {
+          model: Tender,
+          as: 'tender',
+          where: { organisationId: req.user.id }, // only tenders owned by logged in org
+          attributes: ['id', 'title', 'category'],
+        },
+        {
+          model: User,
+          as: 'user', // matches Bid.js alias
+          attributes: ['id', 'name', 'email']
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json({ success: true, data: bids });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+};
+
 
 // Delete a bid by ID
 exports.deleteBid = async (req, res) => {

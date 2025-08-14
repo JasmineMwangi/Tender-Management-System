@@ -1,4 +1,6 @@
 // routes/bidRoutes.js
+const { protect } = require('../middlewares/authMiddleware');
+
 const express = require('express');
 const router = express.Router();
 const bidController = require('../controllers/bidController');
@@ -10,6 +12,7 @@ router.post('/', bidController.createBid);
 // Get all bids
 router.get('/', bidController.getAllBids);
 
+router.get('/received', protect, bidController.getReceivedBids);
 // Get a single bid by ID
 router.get('/:id', bidController.getBidById);
 
