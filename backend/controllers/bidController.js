@@ -123,7 +123,8 @@ exports.updateBid = async (req, res) => {
 // Get bid history for a specific user (bidder)
 exports.getBidHistory = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.user.id;
+    where: { userId }
     const {
       page = 1,
       limit = 10,
@@ -507,10 +508,18 @@ exports.getBidsByUserId = async (req, res) => {
 };
 // Get bids for a specific tender for organization
 exports.getReceivedBids = async (req, res) => {
-  try {
+ console.log('🎯 getReceivedBids function CALLED');
+    console.log('Request method:', req.method);
+    console.log('Request URL:', req.url);
+
+  try { 
+
+
     if (req.user.role !== 'organisation') {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
+
+        console.log('Searching for bids for organisation:', req.user.id);
 
     const bids = await Bid.findAll({
       include: [
@@ -528,7 +537,7 @@ exports.getReceivedBids = async (req, res) => {
       ],
       order: [['createdAt', 'DESC']]
     });
-
+        console.log('Found bids:', bids.length);
     res.json({ success: true, data: bids });
   } catch (error) {
     console.error(error);
@@ -563,61 +572,7 @@ exports.deleteBid = async (req, res) => {
   }
 };
 
-// Get received bids
-exports.getReceivedBids = async (req, res) => {
-  try {
-    const { organisationId } = req.params; // or get from JWT token
-    const receivedBids = await Bid.findAll({
-      include: [
-        {
-          model: Tender,
-          as: 'tender',
-          where: {
-            organisationId: organisationId,
-          },
-          attributes: [
-            'id',
-            'title',
-            'description',
-            'category',
-            'budget',
-            'deadline',
-            'requirements',
-            'location',
-            'status',
-          ],
-          include: [
-            {
-              model: Organisation,
-              as: 'organisation',
-              attributes: ['id', 'name', 'email'],
-            },
-          ],
-        },
-        {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'name', 'email', 'phone'],
-        },
-      ],
-      order: [['createdAt', 'DESC']],
-    });
-
-    return res.status(200).json({
-      success: true,
-      data: receivedBids,
-      count: receivedBids.length,
-    });
-  } catch (error) {
-    console.error('Error fetching received bids:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Internal Server Error',
-      error: error.message,
-    });
-  }
-};
-
+  
 // Get received bids statistics for dashboard
 exports.getReceivedBidsStats = async (req, res) => {
   try {

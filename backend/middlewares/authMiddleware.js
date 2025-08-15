@@ -1,29 +1,68 @@
 //middlewares/authMiddleware.js
+
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const { User } = require('../models/user.js');
 
+// const protect = asyncHandler(async (req, res, next) => {
+//   let token;
+
+//   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+//     try {
+//       token = req.headers.authorization.split(' ')[1];
+//       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+//       req.user = await User.findByPk(decoded.id, {
+//         attributes: { exclude: ['password'] }
+//       });
+      
+//       next();
+//     } catch (error) {
+//       res.status(401).json({ message: 'Not authorized, token failed' });
+//     }
+//   }
+
+//   if (!token) {
+//     res.status(401).json({ message: 'Not authorized, no token' });
+//   }
+// });
 const protect = asyncHandler(async (req, res, next) => {
-  let token;
 
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    try {
-      token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      
-      req.user = await User.findByPk(decoded.id, {
-        attributes: { exclude: ['password'] }
-      });
-      
-      next();
-    } catch (error) {
-      res.status(401).json({ message: 'Not authorized, token failed' });
+      console.log('🔒 PROTECT MIDDLEWARE CALLED');
+    console.log('URL:', req.originalUrl);
+    console.log('Authorization header:', req.headers.authorization);
+    let token;
+    
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        try {
+            token = req.headers.authorization.split(' ')[1];
+
+                        console.log('Token extracted:', token ? 'YES' : 'NO');
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+                        console.log('Token decoded, user ID:', decoded.id);
+            req.user = await User.findByPk(decoded.id, {
+                attributes: { exclude: ['password'] }
+            });
+
+            console.log('User found:', req.user ? req.user.id : 'NOT FOUND');
+            console.log('User role:', req.user?.role);
+            
+            if (!req.user) {
+                return res.status(401).json({ message: 'Not authorized, user not found' });
+            }
+            
+            next(); // This was correctly placed
+        } catch (error) {
+                      console.error('Token verification error:', error.message);
+           // console.error('Token verification error:', error);
+            return res.status(401).json({ message: 'Not authorized, token failed' });
+        }
+    } else {
+              console.log('No Bearer token found');
+        // This block was unreachable before - moved outside the if statement
+        return res.status(401).json({ message: 'Not authorized, no token' });
     }
-  }
-
-  if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
-  }
 });
 
 const authorize = (...roles) => {
