@@ -63,6 +63,16 @@ const MyTenders = () => {
     setFilteredTenders(filtered);
   }, [tenders, searchTerm, statusFilter]);
 
+  useEffect(() => {
+    if (user?.role === 'organization') {
+      setFilteredTenders(
+        tenders.filter(tender => tender.organisationId === (user._id || user.id))
+      );
+    } else {
+      setFilteredTenders(tenders);
+    }
+  }, [tenders, user]);
+
   // Fetch user's tenders from backend
   const fetchMyTenders = async () => {
     try {
@@ -99,13 +109,18 @@ const MyTenders = () => {
   const handleSubmitBid = async (bidData) => {
     try {
       const token = localStorage.getItem('authToken');
+      // Ensure organizationId is included from the logged-in user
+      const payload = {
+        ...bidData,
+        organisationId: user?.id // or user.id depending on your user object
+      };
       const response = await fetch(`${API_BASE_URL}/bids`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(bidData)
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
@@ -124,12 +139,18 @@ const MyTenders = () => {
       throw error;
     }
   };
-
   // Open bid dialog
   const openBidDialog = (tender) => {
     setBidTender(tender);
     setShowBidDialog(true);
   };
+
+  // Call fetchMyTenders after creating a new tender
+  // Call fetchMyTenders after creating a new tender
+  // Update handleSubmit to call fetchMyTenders after successful creation
+  // Remove the useEffect that was watching tenders
+
+  // In handleSubmit, after setTenders([...tenders, updatedTender]);, call fetchMyTenders();
 
   // Close bid dialog
   const closeBidDialog = () => {
@@ -149,13 +170,23 @@ const MyTenders = () => {
 
       const method = modalType === 'create' ? 'POST' : 'PUT';
 
+      // Debug: Log user object and id before sending
+      console.log('Submitting tender with user:', user);
+      console.log('organisationId used:', user?._id || user?.id);
+
+      // Append organizationId from auth user
+      const payload = {
+        ...formData,
+        organisationId: user?._id || user?.id // fallback to both
+      };
+
       const response = await fetch(url, {
         method: method,
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {

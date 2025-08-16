@@ -4,14 +4,22 @@ import {
   Building, AlertCircle, CheckCircle, Clock
 } from 'lucide-react';
 
+import { useAuth } from '../../contexts/AuthContext';
+
+
+
 const BidDialog = ({ 
   isOpen, 
   onClose, 
   tender, 
   onSubmitBid 
 }) => {
+
+
+  const user = useAuth().user; // Assuming user is available in AuthContext
+
   const [bidData, setBidData] = useState({
-    bidAmount: '',
+    amount: '',
     proposedTimeline: '',
     companyName: '',
     contactPerson: '',
@@ -23,7 +31,9 @@ const BidDialog = ({
     certifications: '',
     teamSize: '',
     methodology: '',
-    // tenderId: tender.id
+    userId: user.id,
+    proposalDocument: 'https://example.com/proposal/BID-20250730-0001.pdf'
+    
   });
 
   const [errors, setErrors] = useState({});
@@ -53,8 +63,8 @@ const BidDialog = ({
 
     // Step 1 validation
     if (step === 1) {
-      if (!bidData.bidAmount || bidData.bidAmount <= 0) {
-        newErrors.bidAmount = 'Please enter a valid bid amount';
+      if (!bidData.amount || bidData.amount <= 0) {
+        newErrors.amount = 'Please enter a valid bid amount';
       }
       if (!bidData.proposedTimeline) {
         newErrors.proposedTimeline = 'Please specify your proposed timeline';
@@ -116,7 +126,7 @@ const BidDialog = ({
 
       // Reset form
       setBidData({
-        bidAmount: '',
+        amount: '',
         proposedTimeline: '',
         companyName: '',
         contactPerson: '',
@@ -236,21 +246,21 @@ const BidDialog = ({
                       <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <input
                         type="number"
-                        name="bidAmount"
-                        value={bidData.bidAmount}
+                        name="amount"
+                        value={bidData.amount}
                         onChange={handleInputChange}
                         min="0"
                         step="0.01"
                         className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          errors.bidAmount ? 'border-red-300' : 'border-gray-300'
+                          errors.amount ? 'border-red-300' : 'border-gray-300'
                         }`}
                         placeholder="Enter your bid amount"
                       />
                     </div>
-                    {errors.bidAmount && (
+                    {errors.amount && (
                       <p className="text-red-500 text-xs mt-1 flex items-center">
                         <AlertCircle className="w-3 h-3 mr-1" />
-                        {errors.bidAmount}
+                        {errors.amount}
                       </p>
                     )}
                   </div>
@@ -505,7 +515,7 @@ const BidDialog = ({
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Bid Amount:</span>
-                      <span className="font-medium">{formatCurrency(bidData.bidAmount)}</span>
+                      <span className="font-medium">{formatCurrency(bidData.amount)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Timeline:</span>

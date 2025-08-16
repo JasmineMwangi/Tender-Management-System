@@ -41,7 +41,7 @@ router.get('/', bidController.getAllBids);
  * Middleware: protect (authentication required)
  * Only accessible by users with role 'organisation'
  */
-router.get('/received', protect, bidController.getReceivedBids);
+router.get('/bids/received', protect, bidController.getReceivedBids);
 
 /**
  * Get bids for currently authenticated user
