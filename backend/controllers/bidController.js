@@ -124,7 +124,7 @@ exports.updateBid = async (req, res) => {
 exports.getBidHistory = async (req, res) => {
   try {
     const { userId } = req.user.id;
-    where: { userId }
+    //where: { userId }
     const {
       page = 1,
       limit = 10,

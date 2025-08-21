@@ -63,4 +63,8 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+if (db.Permission) db.Permission = db.Permission;
+if (db.User) db.User = db.User;
+if (db.Role) db.Role = db.Role;
+
 module.exports = db;

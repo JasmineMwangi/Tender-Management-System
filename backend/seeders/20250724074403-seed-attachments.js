@@ -1,38 +1,84 @@
 'use strict';
 
+const { v4: uuidv4 } = require('uuid');
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.bulkInsert('Attachments', [
+    // 1️⃣ Fetch one bid
+    const [bids] = await queryInterface.sequelize.query(
+      `SELECT id FROM bids LIMIT 1;`
+    );
+
+    // 2️⃣ Fetch one user for uploadedBy
+    const [users] = await queryInterface.sequelize.query(
+      `SELECT id FROM users LIMIT 1;`
+    );
+
+    if (!bids.length) {
+      throw new Error("❌ No bids found. Please seed bids first.");
+    }
+    if (!users.length) {
+      throw new Error("❌ No users found. Please seed users first.");
+    }
+
+    const bidId = bids[0].id;
+    const userId = users[0].id; // uploader
+
+    // 3️⃣ Insert attachments
+    await queryInterface.bulkInsert('attachments', [
       {
-        id: 'f81d4fae-7dec-11d0-a765-00a0c91e6bf6',
-        tenderId: '8b488335-7b13-432d-9425-8c20440c4776',
-        userId: '56d41a64-601c-4d91-b7a9-81dd59c5b2b6',
-        filePath: 'uploads/documents/technical_proposal.pdf',
+        id: uuidv4(),
+        bidId: bidId,
+        uploadedBy: userId,
+        filename: 'proposal.pdf',
+        originalName: 'My_Proposal.pdf',
+        fileUrl: '/uploads/proposal.pdf',
+        filePath: '/var/data/uploads/proposal.pdf',
+        fileSize: 102400, // ~100KB
         fileType: 'application/pdf',
+        fileExtension: '.pdf',
+        category: 'bid_proposal',
+        description: 'Technical proposal for tender',
+        isPublic: false,
+        isRequired: true,
+        status: 'active',
+        checksum: null,
+        downloadCount: 0,
+        lastAccessedAt: null,
+        expiresAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-        deletedAt: null
+        deletedAt: null,
       },
       {
-        id: '5c0a7893-2f7a-4bb3-92e0-234a523e19a0',
-        tenderId: '8b488335-7b13-432d-9425-8c20440c4776',
-        userId: '56d41a64-601c-4d91-b7a9-81dd59c5b2b6',
-        filePath: 'uploads/documents/financial_quote.xlsx',
+        id: uuidv4(),
+        bidId: bidId,
+        uploadedBy: userId,
+        filename: 'budget.xlsx',
+        originalName: 'Budget.xlsx',
+        fileUrl: '/uploads/budget.xlsx',
+        filePath: '/var/data/uploads/budget.xlsx',
+        fileSize: 204800, // ~200KB
         fileType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        fileExtension: '.xlsx',
+        category: 'financial_document',
+        description: 'Financial breakdown',
+        isPublic: false,
+        isRequired: true,
+        status: 'active',
+        checksum: null,
+        downloadCount: 0,
+        lastAccessedAt: null,
+        expiresAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-        deletedAt: null
+        deletedAt: null,
       }
     ], {});
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Attachments', {
-      file_path: [
-        'uploads/documents/technical_proposal.pdf',
-        'uploads/documents/financial_quote.xlsx'
-      ]
-    }, {});
+    await queryInterface.bulkDelete('attachments', null, {});
   }
 };

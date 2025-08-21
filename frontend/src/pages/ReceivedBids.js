@@ -15,102 +15,54 @@ const ReceivedBids = () => {
   useEffect(() => {
     // Simulate API call
     setTimeout(() => {
-      const mockBids = [
-        {
-          id: '1',
-          bidNumber: 'BID-20250107-1234',
-          tender: {
-            id: 't1',
-            title: 'Website Development Project',
-            category: 'IT Services',
-            budget: 50000,
-            deadline: '2025-01-20'
-          },
-          bidder: {
-            name: 'TechSolutions Ltd',
-            email: 'contact@techsolutions.com',
-            phone: '+254700123456'
-          },
-          amount: 45000,
-          currency: 'KES',
-          status: 'pending',
-          submittedAt: '2025-01-05T10:30:00Z',
-          proposedTimeline: '8 weeks',
-          technicalScore: null,
-          financialScore: null,
-          totalScore: null,
-          companyName: 'TechSolutions Ltd',
-          experience: '5 years in web development',
-          teamSize: 6
-        },
-        {
-          id: '2',
-          bidNumber: 'BID-20250106-5678',
-          tender: {
-            id: 't2',
-            title: 'Office Renovation',
-            category: 'Construction',
-            budget: 200000,
-            deadline: '2025-01-25'
-          },
-          bidder: {
-            name: 'BuildCorp Kenya',
-            email: 'info@buildcorp.co.ke',
-            phone: '+254722987654'
-          },
-          amount: 185000,
-          currency: 'KES',
-          status: 'under_review',
-          submittedAt: '2025-01-04T14:15:00Z',
-          proposedTimeline: '6 weeks',
-          technicalScore: 85,
-          financialScore: 92,
-          totalScore: 88.5,
-          companyName: 'BuildCorp Kenya',
-          experience: '12 years in commercial construction',
-          teamSize: 15
-        },
-        {
-          id: '3',
-          bidNumber: 'BID-20250105-9101',
-          tender: {
-            id: 't1',
-            title: 'Website Development Project',
-            category: 'IT Services',
-            budget: 50000,
-            deadline: '2025-01-20'
-          },
-          bidder: {
-            name: 'Digital Innovators',
-            email: 'hello@digitalinnovators.com',
-            phone: '+254733456789'
-          },
-          amount: 48000,
-          currency: 'KES',
-          status: 'accepted',
-          submittedAt: '2025-01-03T09:20:00Z',
-          proposedTimeline: '10 weeks',
-          technicalScore: 78,
-          financialScore: 85,
-          totalScore: 81.5,
-          companyName: 'Digital Innovators',
-          experience: '8 years in digital solutions',
-          teamSize: 4
-        }
-      ];
-      setBids(mockBids);
-      setFilteredBids(mockBids);
+
       setLoading(false);
     }, 1000);
   }, []);
 
-  // Filter and search functionality
+
+  useEffect(() => {
+    fetchReceivedBids();
+  }, []);
+
+
+  //  const mockBids = bids
+  // write a funtion  to fetch recived bids from the backend
+  const fetchReceivedBids = async () => {
+    setLoading(true);
+    // try {
+    //   const response = await fetch('http://localhost:5000/api/bids/received', {
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': `Bearer ${localStorage.getItem('token')}`
+    //     }
+    //   }); 
+    try {
+      const response = await fetch('http://localhost:5000/api/bids/received', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch bids');
+      }
+      const bids = await response.json();
+      setBids(bids);
+      setFilteredBids(bids);
+    } catch (error) {
+      console.error('Error fetching bids:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     let filtered = bids;
 
     // Apply search filter
     if (searchTerm) {
-      filtered = filtered.filter(bid => 
+      filtered = filtered.filter(bid =>
         bid.bidNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
         bid.tender.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         bid.companyName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -213,7 +165,7 @@ const ReceivedBids = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-4 rounded-lg shadow border">
           <div className="flex items-center justify-between">
             <div>
@@ -227,7 +179,7 @@ const ReceivedBids = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-4 rounded-lg shadow border">
           <div className="flex items-center justify-between">
             <div>
@@ -241,7 +193,7 @@ const ReceivedBids = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white p-4 rounded-lg shadow border">
           <div className="flex items-center justify-between">
             <div>
@@ -275,7 +227,7 @@ const ReceivedBids = () => {
           </div>
 
           {/* Status Filter */}
-          <select 
+          <select
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -288,7 +240,7 @@ const ReceivedBids = () => {
           </select>
 
           {/* Tender Filter */}
-          <select 
+          <select
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             value={tenderFilter}
             onChange={(e) => setTenderFilter(e.target.value)}
@@ -456,7 +408,7 @@ const ReceivedBids = () => {
                       <div><strong>Amount:</strong> {formatCurrency(selectedBid.amount)}</div>
                       <div><strong>Timeline:</strong> {selectedBid.proposedTimeline}</div>
                       <div><strong>Submitted:</strong> {formatDate(selectedBid.submittedAt)}</div>
-                      <div><strong>Status:</strong> 
+                      <div><strong>Status:</strong>
                         <span className={`ml-2 px-2 py-1 rounded text-xs ${getStatusColor(selectedBid.status)}`}>
                           {selectedBid.status.replace('_', ' ').toUpperCase()}
                         </span>

@@ -27,6 +27,7 @@ const { User } = require('../models/user.js');
 //   }
 // });
 const protect = asyncHandler(async (req, res, next) => {
+  console.log("🔑 JWT_SECRET being used:", process.env.JWT_SECRET);
 
       console.log('🔒 PROTECT MIDDLEWARE CALLED');
     console.log('URL:', req.originalUrl);

@@ -1,12 +1,17 @@
 // controllers/authController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+const { User, Role, Permission } = require('../models');
+//const { User, Role } = require("../models");
+
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
 
 // Helper: Generate token
+console.log("🔑 Signing with secret:", process.env.JWT_SECRET);
+
+
 const generateToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
@@ -46,35 +51,6 @@ exports.registerAdmin = async (req, res) => {
 
 
 
-// POST /api/auth/register/bidder
-// exports.registerBidder = async (req, res) => {
-//   const { name, email, phone, password } = req.body;
-
-//   try {
-//     const existing = await User.findOne({ where: { email } });
-//     if (existing) {
-//       return res.status(400).json({ message: 'Email already in use' });
-//     }
-
-//     const hashedPassword = await bcrypt.hash(password, 10);
-//     const user = await User.create({
-//       name,
-//       email,
-//       phone,
-//       password: hashedPassword,
-//       role: 'bidder',
-//       status: 'active',
-//       emailVerified: 0
-//     });
-
-//     const token = generateToken(user);
-//     res.status(201).json({ token, user });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Registration failed', error: error.message });
-//   }
-// };
-
-
 exports.registerBidder = async (req, res) => {
   const { name, email, phone, password } = req.body;
 
@@ -106,12 +82,7 @@ exports.registerBidder = async (req, res) => {
 };
 
 const { v4: uuidv4 } = require('uuid');
-//const bcrypt = require('bcrypt');
-//const { User } = require('../models');
-//const { generateToken } = require('../utils/jwt'); // Adjust based on your structure
 
-
-// POST /api/auth/register/organization
 exports.registerOrganization = async (req, res) => {
   const { name, email, phone, password } = req.body;
 
@@ -149,41 +120,19 @@ exports.registerOrganization = async (req, res) => {
   }
 };
 
-
-// // POST /api/auth/register/organization
-// exports.registerOrganization = async (req, res) => {
-//   const { organization,first_name,last_name, email, phone, password } = req.body;
-
-//   try {
-//     const existing = await User.findOne({ where: { email } });
-//     if (existing) {
-//       return res.status(400).json({ message: 'Email already in use' });
-//     }
-
-//     const hashedPassword = await bcrypt.hash(password, 10);
-//     const user = await User.create({
-//       organization,
-//       email,
-//       first_name,
-//       last_name,
-//       phone,
-//       password: hashedPassword,
-//       role: 'organisation'
-//     });
-
-//     const token = generateToken(user);
-//     res.status(201).json({ token, user });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Registration failed', error: error.message });
-//   }
-// };
-
 // POST /api/auth/login
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({
+      where: { email },
+      include: {
+        model: Role,
+        include: Permission,
+      },
+    });
+
     if (!user) {
       return res.status(400).json({ message: 'User not found' });
     }
@@ -193,12 +142,31 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = generateToken(user);
-    res.json({ token, user });
+    // Flatten permissions
+    const permissions = user.Roles.flatMap((role) =>
+      role.Permissions.map((p) => p.name)
+    );
+
+    // Generate token with permissions embedded
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      permissions,
+    });
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        permissions,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: 'Login failed', error: error.message });
   }
 };
+
 
 // GET /api/auth/protected (example route)
 exports.protectedRoute = (req, res) => {

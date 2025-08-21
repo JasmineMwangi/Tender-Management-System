@@ -31,17 +31,7 @@ router.post('/', bidController.createBid);
  */
 router.get('/', bidController.getAllBids);
 
-// =============================================
-// SPECIFIC STATIC ROUTES (Must come before parameterized routes)
-// =============================================
-
-/**
- * Get received bids for organization (protected route)
- * GET /api/bids/received
- * Middleware: protect (authentication required)
- * Only accessible by users with role 'organisation'
- */
-router.get('/bids/received', protect, bidController.getReceivedBids);
+router.get('/received', protect, bidController.getReceivedBids);
 
 /**
  * Get bids for currently authenticated user

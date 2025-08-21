@@ -1,38 +1,41 @@
-'use strict';
+"use strict";
+const { v4: uuidv4 } = require("uuid");
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface) {
-    await queryInterface.bulkInsert('Evaluations', [
+  up: async (queryInterface, Sequelize) => {
+    // Ensure there are bids
+    const [bids] = await queryInterface.sequelize.query(
+      `SELECT id, tenderId, userId FROM bids LIMIT 1;`
+    );
+
+    if (!bids || bids.length === 0) {
+      throw new Error("❌ No bids found. Seed bids before evaluations.");
+    }
+
+    const bid = bids[0];
+
+    await queryInterface.bulkInsert("evaluations", [
       {
-        id: 'c3d4e5f6-7890-1234-abcd-001122334455',
-        bidId: 'c0a8c001-1111-4e80-91e0-1111bids0001',
-        evaluatedBy: '3a8421e6-5fc1-4d31-a45b-2e7acbd45678',
-        score: 85,
-        remarks: 'Strong technical proposal, meets most requirements.',
+        id: uuidv4(),
+        evaluationNumber: "EV-001",
+        bidId: bid.id,           // ✅ real bid
+        tenderId: bid.tenderId,  // ✅ matching tender
+        evaluationType: "overall",
+        evaluationPhase: "final_assessment",
+        overallScore: 85.5,
+        maxPossibleScore: 100.0,
+        technicalWeight: 0.7,
+        financialWeight: 0.3,
+        status: "completed",
+        evaluatedBy: bid.userId,
+        createdBy: bid.userId,
         createdAt: new Date(),
         updatedAt: new Date(),
-        deletedAt: null
       },
-      {
-        id: 'd1a2b3c4-5678-9101-abcd-556677889900',
-        bidId: 'c0a8c001-1111-4e80-91e0-1111bids0001',
-        evaluatedBy: '3a8421e6-5fc1-4d31-a45b-2e7acbd45678',
-        score: 72,
-        remarks: 'Good effort, but lacks detail in financials.',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        deletedAt: null
-      }
-    ], {});
+    ]);
   },
 
-  async down(queryInterface) {
-    await queryInterface.bulkDelete('Evaluations', {
-      id: [
-        'c3d4e5f6-7890-1234-abcd-001122334455',
-        'd1a2b3c4-5678-9101-abcd-556677889900'
-      ]
-    }, {});
-  }
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.bulkDelete("evaluations", null, {});
+  },
 };

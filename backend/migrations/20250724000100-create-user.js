@@ -2,7 +2,7 @@
 
 module.exports = {
     up: async (queryInterface, Sequelize) => {
-        await queryInterface.createTable('users', {
+        await queryInterface.createTable('Users', {
             id: {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
@@ -107,6 +107,6 @@ module.exports = {
         await queryInterface.removeIndex('users', 'users_deleted_at_index');
         
         // Drop the table
-        await queryInterface.dropTable('users');
+        await queryInterface.dropTable('Users');
     },
 };

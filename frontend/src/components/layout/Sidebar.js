@@ -9,12 +9,13 @@ const Sidebar = ({ userRole }) => {
     const commonItems = [
       { path: '/app/dashboard', label: 'Dashboard', icon: '📊' },
       { path: '/app/my-tenders', label: 'Tenders', icon: '📋' },
+      { path: '/app/profile', label: 'Profile', icon: '👤' },
+      { path: '/app/Settings', label: 'Settings', icon: '⚙️' },
     ];
 
     const roleBasedItems = {
       admin: [
         { path: '/app/users', label: 'Users', icon: '👥' },
-        { path: '/app/tenders', label: 'All Tenders', icon: '📋' },
         { path: '/app/bids', label: 'All Bids', icon: '📝' },
         { path: '/app/reports', label: 'Reports', icon: '📈' }
       ],

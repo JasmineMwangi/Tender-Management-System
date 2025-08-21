@@ -30,14 +30,6 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-// Mock hooks and API calls for demonstration
-// const useAuth = () => ({
-//   user: { 
-//     name: '', 
-//     role: '' // Change this to 'organization' or 'bidder' to test different dashboards
-//   }
-// });
-
 
 
 const useApi = (apiCall, deps) => {
