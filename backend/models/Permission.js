@@ -11,11 +11,17 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
     }
-  });
+  },
+    {
+      tableName: "permissions",   // 👈 exact name in DB
+      timestamps: true  
+    }
+);
 
   Permission.associate = (models) => {
     Permission.belongsToMany(models.Role, {
-      through: "RolePermissions",
+      through: "rolepermissions",
+      as: "roles",
       foreignKey: "permissionId",
     });
   };

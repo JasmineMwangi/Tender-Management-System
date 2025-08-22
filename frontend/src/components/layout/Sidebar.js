@@ -9,8 +9,11 @@ const Sidebar = ({ userRole }) => {
     const commonItems = [
       { path: '/app/dashboard', label: 'Dashboard', icon: '📊' },
       { path: '/app/my-tenders', label: 'Tenders', icon: '📋' },
+    ];
+
+    const bottomItems = [
       { path: '/app/profile', label: 'Profile', icon: '👤' },
-      { path: '/app/Settings', label: 'Settings', icon: '⚙️' },
+      { path: '/app/settings', label: 'Settings', icon: '⚙️' }, // 👈 also fixed lowercase "settings"
     ];
 
     const roleBasedItems = {
@@ -29,25 +32,25 @@ const Sidebar = ({ userRole }) => {
       ]
     };
 
-    return [...commonItems, ...(roleBasedItems[userRole] || [])];
+    // Return role + common first, then bottom always last
+    return [...commonItems, ...(roleBasedItems[userRole] || []), ...bottomItems];
   };
 
   const menuItems = getMenuItems();
 
   return (
-    // CHANGED: Added Tailwind-like fixed positioning and full height
     <aside 
-      className="sidebar fixed top-0 left-0 h-full shadow-lg" // CHANGED
-      style={{ width: '240px', backgroundColor: '#1f2937', color: '#fff' }} // CHANGED: Added inline style for width + bg color
+      className="sidebar fixed top-0 left-0 h-full shadow-lg"
+      style={{ width: '240px', backgroundColor: '#1f2937', color: '#fff' }}
     >
-      <ul className="sidebar-nav p-4"> {/* CHANGED: Added padding */}
+      <ul className="sidebar-nav p-4">
         {menuItems.map((item) => (
-          <li key={item.path} className="mb-2"> {/* CHANGED: Added margin between links */}
+          <li key={item.path} className="mb-2">
             <Link
               to={item.path}
               className={`flex items-center p-2 rounded hover:bg-gray-700 transition ${
                 location.pathname === item.path ? 'bg-gray-800 font-bold' : ''
-              }`} // CHANGED: Added flex, hover effects, and active style
+              }`}
             >
               <span className="mr-2">{item.icon}</span>
               {item.label}

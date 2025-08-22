@@ -13,7 +13,7 @@ console.log("🔑 Signing with secret:", process.env.JWT_SECRET);
 
 
 const generateToken = (user) => {
-  return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+  return jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
   });
 };
@@ -127,43 +127,61 @@ exports.login = async (req, res) => {
   try {
     const user = await User.findOne({
       where: { email },
-      include: {
-        model: Role,
-        include: Permission,
-      },
+      include: [
+        {
+          model: Role,
+          as: "roles",
+          include: [
+            {
+              model: Permission,
+              as: "permissions",
+            },
+          ],
+        },
+      ],
     });
 
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(400).json({ message: "User not found" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Flatten permissions
-    const permissions = user.Roles.flatMap((role) =>
-      role.Permissions.map((p) => p.name)
-    );
+    // ✅ Convert to plain object so includes behave as expected
+    const plainUser = user.get({ plain: true });
 
-    // Generate token with permissions embedded
+    // Extract first role
+    const role = plainUser.roles?.length ? plainUser.roles[0].name : null;
+
+    // Extract permissions
+    const permissions = plainUser.roles?.flatMap(
+      (r) => r.permissions?.map((p) => p.name) ?? []
+    ) ?? [];
+
+    // ✅ Generate token with role + permissions
     const token = generateToken({
-      id: user.id,
-      email: user.email,
+      id: plainUser.id,
+      email: plainUser.email,
+      role,
       permissions,
     });
 
     res.json({
+      success: true,
       token,
       user: {
-        id: user.id,
-        email: user.email,
+        id: plainUser.id,
+        email: plainUser.email,
+        role,
         permissions,
       },
     });
   } catch (error) {
-    res.status(500).json({ message: 'Login failed', error: error.message });
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Login failed", error: error.message });
   }
 };
 

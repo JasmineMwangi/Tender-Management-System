@@ -508,18 +508,17 @@ exports.getBidsByUserId = async (req, res) => {
 };
 // Get bids for a specific tender for organization
 exports.getReceivedBids = async (req, res) => {
- console.log('🎯 getReceivedBids function CALLED');
-    console.log('Request method:', req.method);
-    console.log('Request URL:', req.url);
+  console.log('🎯 getReceivedBids function CALLED');
+  console.log('Request method:', req.method);
+  console.log('Request URL:', req.url);
 
-  try { 
-
-
-    if (req.user.role !== 'organisation') {
+  try {
+    // ✅ Allow organisation and admin
+    if (!['organisation', 'admin'].includes(req.user.role)) {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
 
-        console.log('Searching for bids for organisation:', req.user.id);
+    console.log('Searching for bids for organisation:', req.user.id);
 
     const bids = await Bid.findAll({
       include: [
@@ -537,10 +536,11 @@ exports.getReceivedBids = async (req, res) => {
       ],
       order: [['createdAt', 'DESC']]
     });
-        console.log('Found bids:', bids.length);
+
+    console.log('Found bids:', bids.length);
     res.json({ success: true, data: bids });
   } catch (error) {
-    console.error(error);
+    console.error('❌ Error in getReceivedBids:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };

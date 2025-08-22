@@ -161,35 +161,57 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   // Associations
+  // User.associate = (models) => {
+  //   // Only define if models exist
+  //   if (models.Tender) {
+  //     User.hasMany(models.Tender, {
+  //       foreignKey: 'organisationId', // Adjust based on your Tender model
+  //       as: 'tenders'
+  //     });
+  //   }
+
+  //   if (models.Bid) {
+  //     User.hasMany(models.Bid, {
+  //       foreignKey: 'userId', // Adjust based on your Bid model
+  //       as: 'bids'
+  //     });
+  //   }
+  //   User.associate = (models) => {
+  //     User.belongsToMany(models.Role, {
+  //       through: "userRoles",
+  //       foreignKey: "userId",
+  //     });
+  //   }
+
+  //    User.belongsToMany(models.Role, {
+  //     through: 'Userroles',
+  //     foreignKey: 'userId',
+  //     otherKey: 'roleId'
+  //    });
   User.associate = (models) => {
-    // Only define if models exist
-    if (models.Tender) {
-      User.hasMany(models.Tender, {
-        foreignKey: 'organisationId', // Adjust based on your Tender model
-        as: 'tenders'
-      });
-    }
+  if (models.Tender) {
+    User.hasMany(models.Tender, {
+      foreignKey: 'organisationId',
+      as: 'tenders'
+    });
+  }
 
-    if (models.Bid) {
-      User.hasMany(models.Bid, {
-        foreignKey: 'userId', // Adjust based on your Bid model
-        as: 'bids'
-      });
-    }
-    User.associate = (models) => {
-      User.belongsToMany(models.Role, {
-        through: "userRoles",
-        foreignKey: "userId",
-      });
-    }
-
-     User.belongsToMany(models.Role, {
-      through: 'Userroles',
+  if (models.Bid) {
+    User.hasMany(models.Bid, {
       foreignKey: 'userId',
-      otherKey: 'roleId'
-     });
-    
-  };
+      as: 'bids'
+    });
+  }
+  User.belongsToMany(models.Role, {
+  through: { model: "userrole" },
+  foreignKey: "userId",
+  otherKey: "roleId",
+  as: "roles"
+});
+
+};
+
+
 
   return User;
 };
