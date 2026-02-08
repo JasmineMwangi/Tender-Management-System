@@ -10,13 +10,14 @@ import BidderRegister from './components/auth/BidderRegister';
 import OrganizationRegister from './components/auth/OrganizationRegister';
 import AdminRegister from './components/auth/AdminRegister';
 import Dashboard from './pages/Dashboard';
+import ProfileRouter from './pages/ProfileRouter';
 import MyTenders from './pages/Mytenders';
 import BidList from './pages/BidList';
 import './App.css';
 import ReceivedBids from './pages/ReceivedBids';
 import BidHistory from './pages/BidHistory'; 
 
-// Dummy placeholders - replace with actual components as you build them
+// Dummy placeholders
 const TenderList = () => (
   <div className="p-6">
     <h1 className="text-2xl font-bold text-gray-900 mb-4">📋 Tender List</h1>
@@ -34,15 +35,6 @@ const TenderCreate = () => (
     </div>
   </div>
 );
-
-// const BidList = () => (
-//   <div className="p-6">
-//     <h1 className="text-2xl font-bold text-gray-900 mb-4">💼 Bid List</h1>
-//     <div className="bg-white rounded-lg shadow p-6">
-//       <p className="text-gray-600">Bid List component - Coming Soon</p>
-//     </div>
-//   </div>
-// );
 
 const UserList = () => (
   <div className="p-6">
@@ -89,11 +81,7 @@ function App() {
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register/bidder" element={<BidderRegister />} />
             <Route path="/register/organization" element={<OrganizationRegister />} />
-            <Route path="/register/admin"element={<AdminRegister/> }/>
-
-            {/* add bidList */}
-            <Route path="/my-bids" element={<BidList />} />
-            {/* <Route path="/app/bids/received" element={<ReceivedBids />} /> */}
+            <Route path="/register/admin" element={<AdminRegister />} />
 
             {/* 🔒 Protected Routes */}
             <Route path="/unauthorized" element={<Unauthorized />} />
@@ -109,6 +97,9 @@ function App() {
             >
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
+
+              {/* 👤 PROFILE ROUTE - FIXED! */}
+              <Route path="profile" element={<ProfileRouter />} />
 
               {/* 🔐 Admin Only Routes */}
               <Route
@@ -147,11 +138,10 @@ function App() {
                 }
               />
               
-
               <Route
                 path="tender/create"
                 element={
-                  <ProtectedRoute >
+                  <ProtectedRoute>
                     <TenderCreate />
                   </ProtectedRoute>
                 }
@@ -174,14 +164,15 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-                <Route
+              <Route
                 path="bid-history"
                 element={
                   <ProtectedRoute>
-                  <BidHistory />
+                    <BidHistory />
                   </ProtectedRoute>
                 }
-                />
+              />
+
               {/* 🔄 Shared Routes */}
               <Route
                 path="tenders"

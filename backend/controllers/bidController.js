@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const { Bid, Tender, User, Organisation, Sequelize } = require('../models');
+const { Bid, Tender, User, Organization, Sequelize } = require('../models');
 const { Op } = Sequelize;
 
 // Utility function to generate bid number (modify as per your requirements)
@@ -170,8 +170,8 @@ exports.getBidHistory = async (req, res) => {
           ],
           include: [
             {
-              model: Organisation,
-              as: 'organisation',
+              model: Organization,
+              as: 'organization',
               attributes: ['id', 'name', 'email', 'phone']
             }
           ]
@@ -253,10 +253,11 @@ exports.getBidHistoryStats = async (req, res) => {
     // Format status statistics
     const formattedStats = {
       total: totalBids,
-      pending: 0,
-      under_review: 0,
-      accepted: 0,
+      submitted: 0,
+      reviewed: 0,
+      qualified: 0,
       rejected: 0,
+      awarded: 0,
       successRate: parseFloat(successRate),
       avgBidAmount: parseFloat(avgBidAmount?.avgAmount || 0),
       recentActivity
@@ -300,8 +301,8 @@ exports.getBidDetailsForBidder = async (req, res) => {
           ],
           include: [
             {
-              model: Organisation,
-              as: 'organisation',
+              model: Organization,
+              as: 'organization',
               attributes: ['id', 'name', 'email', 'phone', 'website']
             }
           ]
@@ -513,19 +514,19 @@ exports.getReceivedBids = async (req, res) => {
   console.log('Request URL:', req.url);
 
   try {
-    // ✅ Allow organisation and admin
-    if (!['organisation', 'admin'].includes(req.user.role)) {
+    // ✅ Allow organization and admin
+    if (!['organization', 'admin'].includes(req.user.role)) {
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
 
-    console.log('Searching for bids for organisation:', req.user.id);
+    console.log('Searching for bids for organization:', req.user.id);
 
     const bids = await Bid.findAll({
       include: [
         {
           model: Tender,
           as: 'tender',
-          where: { organisationId: req.user.id }, // only tenders owned by logged in org
+          where: { organizationId: req.user.id }, // only tenders owned by logged in org
           attributes: ['id', 'title', 'category'],
         },
         {
@@ -576,14 +577,14 @@ exports.deleteBid = async (req, res) => {
 // Get received bids statistics for dashboard
 exports.getReceivedBidsStats = async (req, res) => {
   try {
-    const { organisationId } = req.params;
+    const { organizationId } = req.params;
     const stats = await Bid.findAll({
       include: [
         {
           model: Tender,
           as: 'tender',
           where: {
-            organisationId: organisationId,
+            organisazionId: organisazionId,
           },
           attributes: [],
         },
@@ -796,7 +797,7 @@ exports.getBidsByTender = async (req, res) => {
 // Export bids to CSV
 exports.exportReceivedBids = async (req, res) => {
   try {
-    const { organisationId } = req.params;
+    const { organizationId } = req.params;
     const { format = 'csv' } = req.query;
 
     const receivedBids = await Bid.findAll({
@@ -805,7 +806,7 @@ exports.exportReceivedBids = async (req, res) => {
           model: Tender,
           as: 'tender',
           where: {
-            organisationId: organisationId,
+            organizationId: organizationId,
           },
           attributes: ['title', 'category', 'budget'],
         },
@@ -867,7 +868,7 @@ exports.exportReceivedBids = async (req, res) => {
 // Search and filter received bids
 exports.searchReceivedBids = async (req, res) => {
   try {
-    const { organisationId } = req.params;
+    const { organizationId } = req.params;
     const {
       search,
       status,
@@ -882,7 +883,7 @@ exports.searchReceivedBids = async (req, res) => {
 
     const whereConditions = {};
     const tenderWhereConditions = {
-      organisationId: organisationId,
+      organizationId: organizationId,
     };
 
     if (search) {

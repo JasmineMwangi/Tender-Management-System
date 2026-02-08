@@ -50,7 +50,7 @@ module.exports = {
                 allowNull: false,
                 defaultValue: 'draft',
             },
-            organisationId: {
+            organizationId: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
@@ -77,8 +77,8 @@ module.exports = {
         });
 
         // Add indexes for performance
-        await queryInterface.addIndex('tenders', ['organisationId'], {
-            name: 'tenders_organisation_id_index'
+        await queryInterface.addIndex('tenders', ['organizationId'], {
+            name: 'tenders_organization_id_index'
         });
         await queryInterface.addIndex('tenders', ['status'], {
             name: 'tenders_status_index'
@@ -89,18 +89,18 @@ module.exports = {
         await queryInterface.addIndex('tenders', ['category'], {
             name: 'tenders_category_index'
         });
-        await queryInterface.addIndex('tenders', ['deleted_at'], {
-            name: 'tenders_deleted_at_index'
+        await queryInterface.addIndex('tenders', ['deletedAt'], {
+            name: 'tenders_deletedAt_index'
         });
     },
 
     down: async (queryInterface) => {
         const indexesToDrop = [
-            'tenders_organisation_id_index',
+            'tenders_organization_id_index',
             'tenders_status_index',
             'tenders_deadline_index',
             'tenders_category_index',
-            'tenders_deleted_at_index'
+            'tenders_deletedAt_index'
         ];
 
         for (const indexName of indexesToDrop) {

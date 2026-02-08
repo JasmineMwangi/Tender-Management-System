@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Download, Eye, MessageSquare, Calendar, DollarSign, Building, User, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Search, Download, Eye, MessageSquare, Calendar, Building, CheckCircle, XCircle, Clock } from 'lucide-react';
 
 const ReceivedBids = () => {
   const [bids, setBids] = useState([]);
@@ -48,9 +48,9 @@ const ReceivedBids = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch bids');
       }
-      const bids = await response.json();
-      setBids(bids);
-      setFilteredBids(bids);
+      const result = await response.json();
+      setBids(result.data || []);
+      setFilteredBids(result.data || []);
     } catch (error) {
       console.error('Error fetching bids:', error);
     } finally {
@@ -297,10 +297,10 @@ const ReceivedBids = () => {
                 <tr key={bid.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="font-medium text-gray-900">{bid.bidNumber}</div>
+                      <div className="font-medium text-gray-900">{bid.id}</div>
                       <div className="text-sm text-gray-500">
                         <Calendar className="inline w-3 h-3 mr-1" />
-                        {formatDate(bid.submittedAt)}
+                        {formatDate(bid.createdAt)}
                       </div>
                       <div className="text-sm text-gray-500">
                         Timeline: {bid.proposedTimeline}
@@ -318,8 +318,8 @@ const ReceivedBids = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div>
-                      <div className="font-medium text-gray-900">{bid.companyName}</div>
-                      <div className="text-sm text-gray-500">{bid.bidder.email}</div>
+                      <div className="font-medium text-gray-900">{bid.user?.name}</div>
+                      <div className="text-sm text-gray-500">{bid.user?.email}</div>
                       <div className="text-sm text-gray-500">
                         Team: {bid.teamSize} members
                       </div>

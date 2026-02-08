@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
   class Organization extends Model {
     static associate(models) {
       Organization.belongsTo(models.User, { foreignKey: 'user_id' });
-      Organization.hasMany(models.Tender, { foreignKey: 'organisationId' });
+      Organization.hasMany(models.Tender, { foreignKey: 'organizationId' });
     }
   }
 
@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
   });
   
 
-//   Organization.hasMany(Tender, { foreignKey: 'organization_id' });
+ //Organization.hasMany(Tender, { foreignKey: 'organization_id' });
 // Tender.belongsTo(Organization, { foreignKey: 'organization_id' });
 
 

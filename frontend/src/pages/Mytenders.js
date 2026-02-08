@@ -66,7 +66,7 @@ const MyTenders = () => {
   useEffect(() => {
     if (user?.role === 'organization') {
       setFilteredTenders(
-        tenders.filter(tender => tender.organisationId === (user._id || user.id))
+        tenders.filter(tender => tender.organizationId === (user._id || user.id))
       );
     } else {
       setFilteredTenders(tenders);
@@ -112,7 +112,7 @@ const MyTenders = () => {
       // Ensure organizationId is included from the logged-in user
       const payload = {
         ...bidData,
-        organisationId: user?.id // or user.id depending on your user object
+        organizationId: user?.id // or user.id depending on your user object
       };
       const response = await fetch(`${API_BASE_URL}/bids`, {
         method: 'POST',
@@ -172,12 +172,12 @@ const MyTenders = () => {
 
       // Debug: Log user object and id before sending
       console.log('Submitting tender with user:', user);
-      console.log('organisationId used:', user?._id || user?.id);
+      console.log('organizationId used:', user?._id || user?.id);
 
       // Append organizationId from auth user
       const payload = {
         ...formData,
-        organisationId: user?._id || user?.id // fallback to both
+        organizationId: user?._id || user?.id // fallback to both
       };
 
       const response = await fetch(url, {

@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM('draft', 'published', 'pending', 'closed'),
       defaultValue: 'draft'
     },
-    organisationId: { // Match the foreign key name used in User model
+    organizationId: { // Match the foreign key name used in User model
       type: DataTypes.UUID,
       allowNull: false,
       references: {
@@ -38,8 +38,8 @@ module.exports = (sequelize, DataTypes) => {
   });
   Tender.associate = models => {
     Tender.belongsTo(models.User, { 
-      foreignKey: 'organisationId', 
-      as: 'organisation' 
+      foreignKey: 'organizationId', 
+      as: 'organization' 
     });
     Tender.hasMany(models.Bid, { 
       foreignKey: 'tenderId',

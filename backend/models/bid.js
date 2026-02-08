@@ -21,7 +21,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('submitted', 'reviewed', 'qualified', 'rejected', 'awarded'),
+       type: DataTypes.ENUM('submitted', 'reviewed', 'qualified', 'rejected', 'awarded'),
+      //  type: DataTypes.ENUM('under review', 'accepted', 'withdrawn', 'pending' ),
       defaultValue: 'submitted'
     },
     type: {

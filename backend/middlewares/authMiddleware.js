@@ -50,7 +50,7 @@ const protect = asyncHandler(async (req, res, next) => {
     //return res.status(401).json({ message: 'Not authorized, no token, error: error.message' });
     return res.status(401).json({
       message: 'Not authorized, token failed',
-      error: error.message
+      //error: error.message
     });
 
   }

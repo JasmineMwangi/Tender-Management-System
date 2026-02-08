@@ -29,9 +29,10 @@ router.post('/', bidController.createBid);
  * Get all bids (admin/general purpose)
  * GET /api/bids/
  */
-router.get('/', bidController.getAllBids);
+// router.get('/', bidController.getAllBids);
 
 router.get('/received', protect, bidController.getReceivedBids);
+router.get('/', bidController.getAllBids);
 
 /**
  * Get bids for currently authenticated user
@@ -51,10 +52,6 @@ router.get('/user-bids', protect, async (req, res) => {
     }
 });
 
-// =============================================
-// BID HISTORY ROUTES (Specific multi-segment paths)
-// These handle bidder-specific functionality
-// =============================================
 
 /**
  * Get bid history for a specific user
@@ -86,9 +83,6 @@ router.get('/history/:id/timeline', bidController.getBidTimeline);
  */
 router.patch('/history/:id/withdraw', bidController.withdrawBid);
 
-// =============================================
-// USER-SPECIFIC ROUTES (Single parameter routes)
-// =============================================
 
 /**
  * Get bids by specific user ID
@@ -96,11 +90,7 @@ router.patch('/history/:id/withdraw', bidController.withdrawBid);
  */
 router.get('/user/:userId', bidController.getBidsByUserId);
 
-// =============================================
-// PARAMETERIZED ROUTES (Must come LAST)
-// These routes use :id parameter and will match any single segment
-// If placed earlier, they would intercept specific routes like /received
-// =============================================
+
 
 /**
  * Get a single bid by ID
@@ -122,27 +112,6 @@ router.put('/:id', bidController.updateBid);
  */
 router.delete('/:id', bidController.deleteBid);
 
-// =============================================
-// ROUTE ORDERING EXPLANATION
-// =============================================
-/*
- * CRITICAL: Route order matters in Express.js!
- * 
- * Routes are matched in the order they are defined.
- * More specific routes must come before more general ones.
- * 
- * CORRECT ORDER:
- * 1. Static routes (exact matches): /received, /user-bids
- * 2. Multi-segment specific: /history/user/:userId, /history/:id/details
- * 3. Single parameter routes: /user/:userId
- * 4. Generic parameter routes: /:id (catches everything else)
- * 
- * WRONG ORDER EXAMPLE:
- * If router.get('/:id', ...) came before router.get('/received', ...)
- * then '/received' would be treated as an ID parameter and routed
- * to the getBidById controller instead of getReceivedBids.
- * 
- * This is why the original issue occurred - /:id was matching /received
- */
+
 
 module.exports = router;

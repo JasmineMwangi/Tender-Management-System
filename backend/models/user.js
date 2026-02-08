@@ -191,7 +191,7 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = (models) => {
   if (models.Tender) {
     User.hasMany(models.Tender, {
-      foreignKey: 'organisationId',
+      foreignKey: 'organizationId',
       as: 'tenders'
     });
   }

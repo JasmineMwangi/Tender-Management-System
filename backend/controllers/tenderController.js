@@ -62,7 +62,7 @@ exports.getAllTenders = async (req, res) => {
       include: [
         {
           model: User,
-          as: 'organisation',
+          as: 'organization',
           attributes: ['id', 'name', 'email']
         }
       ],
