@@ -52,7 +52,9 @@ exports.registerAdmin = async (req, res) => {
 
 
 exports.registerBidder = async (req, res) => {
-  const { name, email, phone, password } = req.body;
+  const { firstName, lastName, email, phone, password } = req.body;
+  const name = `${firstName} ${lastName}`;
+  // const { name, email, phone, password } = req.body;
 
   try {
     const existing = await User.findOne({ where: { email } });
