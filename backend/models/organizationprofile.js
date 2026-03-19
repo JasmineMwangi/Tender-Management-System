@@ -4,12 +4,13 @@
 module.exports = (sequelize, DataTypes) => {
   const OrganizationProfile = sequelize.define('OrganizationProfile', {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,  // ← add this
       primaryKey: true,
-      autoIncrement: true
+      // autoIncrement: true
     },
     userId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       unique: true,
       references: {
@@ -176,7 +177,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     }
   }, {
-    tableName: 'organization_profiles',
+    tableName: 'organizationprofile',
     timestamps: true,
     indexes: [
       {

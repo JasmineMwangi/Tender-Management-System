@@ -169,12 +169,12 @@ const ReceivedBids = () => {
         <div className="bg-white p-4 rounded-lg shadow border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Pending Review</p>
-              <p className="text-2xl font-bold text-yellow-600">
-                {bids.filter(b => b.status === 'pending').length}
+              <p className="text-sm text-gray-600">Rejected</p>
+              <p className="text-2xl font-bold text-red-600">
+                {bids.filter(b => b.status === 'rejected').length}
               </p>
             </div>
-            <div className="bg-yellow-100 p-2 rounded-full">
+            <div className="bg-red-100 p-2 rounded-full">
               <Clock className="w-6 h-6 text-yellow-600" />
             </div>
           </div>
@@ -233,7 +233,7 @@ const ReceivedBids = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option value="all">All Statuses</option>
-            <option value="pending">Pending</option>
+            {/* <option value="pending">Pending</option> */}
             <option value="under_review">Under Review</option>
             <option value="accepted">Accepted</option>
             <option value="rejected">Rejected</option>

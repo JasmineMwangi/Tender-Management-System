@@ -15,30 +15,13 @@ router.use((req, res, next) => {
     next();
 });
 
-// =============================================
-// BASIC BID CRUD OPERATIONS
-// =============================================
-
-/**
- * Create a new bid
- * POST /api/bids/
- */
 router.post('/', bidController.createBid);
 
-/**
- * Get all bids (admin/general purpose)
- * GET /api/bids/
- */
-// router.get('/', bidController.getAllBids);
+
 
 router.get('/received', protect, bidController.getReceivedBids);
 router.get('/', bidController.getAllBids);
 
-/**
- * Get bids for currently authenticated user
- * GET /api/bids/user-bids
- * Requires authentication to access req.user
- */
 router.get('/user-bids', protect, async (req, res) => {
     try {
         console.log('🔍 Fetching user-bids for user:', req.user?.id);
@@ -53,63 +36,33 @@ router.get('/user-bids', protect, async (req, res) => {
 });
 
 
-/**
- * Get bid history for a specific user
- * GET /api/bids/history/user/:userId
- */
+
 router.get('/history/user/:userId', bidController.getBidHistory);
 
-/**
- * Get bid history statistics for dashboard
- * GET /api/bids/history/user/:userId/stats
- */
+
 router.get('/history/user/:userId/stats', bidController.getBidHistoryStats);
 
-/**
- * Get detailed bid information (bidder view)
- * GET /api/bids/history/:id/details
- */
 router.get('/history/:id/details', bidController.getBidDetailsForBidder);
 
-/**
- * Get bid timeline/activity log
- * GET /api/bids/history/:id/timeline
- */
+
 router.get('/history/:id/timeline', bidController.getBidTimeline);
 
-/**
- * Withdraw a pending bid
- * PATCH /api/bids/history/:id/withdraw
- */
+
 router.patch('/history/:id/withdraw', bidController.withdrawBid);
 
 
-/**
- * Get bids by specific user ID
- * GET /api/bids/user/:userId
- */
+
 router.get('/user/:userId', bidController.getBidsByUserId);
 
 
 
-/**
- * Get a single bid by ID
- * GET /api/bids/:id
- * WARNING: This route matches any single path segment
- * Must be placed after all specific routes
- */
+
 router.get('/:id', bidController.getBidById);
 
-/**
- * Update a bid by ID
- * PUT /api/bids/:id
- */
+
 router.put('/:id', bidController.updateBid);
 
-/**
- * Delete a bid by ID
- * DELETE /api/bids/:id
- */
+
 router.delete('/:id', bidController.deleteBid);
 
 

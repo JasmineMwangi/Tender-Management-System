@@ -7,20 +7,27 @@ const generateBidNumber = () => {
   return `BID-${Math.floor(1000 + Math.random() * 9000)}-${Date.now()}`;
 };
 
-// Get all bids
+
 exports.getAllBids = async (req, res) => {
   try {
-    const bids = await Bid.findAll();
-    res.status(200).json(bids);
-  } catch (error) {
-    console.error('Error fetching bids:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal Server Error',
+    const { tenderId } = req.query; // 👈 read from query params
+    const where = tenderId ? { tenderId } : {};
+    const bids = await Bid.findAll({
+      where,
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'name', 'email'],
+        },
+      ],
+      order: [['createdAt', 'DESC']],
     });
+    res.json(bids);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
-
 // Create Bid
 exports.createBid = async (req, res) => {
   try {

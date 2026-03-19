@@ -19,6 +19,9 @@ const MyTenders = () => {
   const [modalType, setModalType] = useState('create'); // 'create', 'edit', 'view'
   const [selectedTender, setSelectedTender] = useState(null);
 
+  const [activeTenderId, setActiveTenderId] = useState('');
+  const [evalLoading, setEvalLoading] = useState(false);
+
   // Add bid dialog state
   const [showBidDialog, setShowBidDialog] = useState(false);
   const [bidTender, setBidTender] = useState(null);
@@ -236,6 +239,37 @@ const MyTenders = () => {
     }
   };
 
+ const handleRunEvaluation = async () => {
+  console.log("Run evaluation clicked");
+
+  if (!activeTenderId) {
+    console.log("No tender selected");
+    return;
+  }
+
+  try {
+    setEvalLoading(true);
+
+    const token = localStorage.getItem("authToken");
+
+    const response = await fetch(`${API_BASE_URL}/evaluation/run/${activeTenderId}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await response.json();
+    console.log("Evaluation result:", result);
+
+  } catch (error) {
+    console.error("Evaluation error:", error);
+  } finally {
+    setEvalLoading(false);
+  }
+};
+
   // Open modal for different actions
   const openModal = (type, tender = null) => {
     setModalType(type);
@@ -310,9 +344,10 @@ const MyTenders = () => {
 
   // Format currency
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-KE', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'KES',
+      minimumFractionDigits: 0
     }).format(amount || 0);
   };
 
@@ -392,6 +427,42 @@ const MyTenders = () => {
             {error}
           </div>
         )}
+
+
+        {/* Bid Evaluation Panel */}
+<div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+    Bid Evaluation
+  </h2>
+
+  <div className="flex gap-3">
+
+    <select
+      className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700"
+      value={activeTenderId}
+      onChange={(e) => setActiveTenderId(e.target.value)}
+    >
+      <option value="">Select a tender...</option>
+
+      {tenders
+        .filter(t => t.status === "closed" || t.status === "published")
+        .map((t) => (
+          <option key={t.id} value={t.id}>
+            {t.title}
+          </option>
+        ))}
+    </select>
+
+    <button
+      onClick={handleRunEvaluation}
+      disabled={!activeTenderId || evalLoading}
+      className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+    >
+      {evalLoading ? "Evaluating..." : "▶ Run Evaluation"}
+    </button>
+
+  </div>
+</div>
 
         {/* Tenders Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

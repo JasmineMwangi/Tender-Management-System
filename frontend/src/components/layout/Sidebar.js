@@ -7,28 +7,29 @@ const Sidebar = ({ userRole }) => {
 
   const getMenuItems = () => {
     const commonItems = [
-      { path: '/app/dashboard', label: 'Dashboard', icon: '📊' },
-      { path: '/app/my-tenders', label: 'Tenders', icon: '📋' },
+      { path: '/app/dashboard', label: 'Dashboard', },
+      { path: '/app/my-tenders', label: 'Tenders',  },
     ];
 
     const bottomItems = [
-      { path: '/app/profile', label: 'Profile', icon: '👤' },
-      { path: '/app/settings', label: 'Settings', icon: '⚙️' }, // 👈 also fixed lowercase "settings"
+      { path: '/app/profile', label: 'Profile',  },
+      { path: '/app/settings', label: 'Settings',  }, // 👈 also fixed lowercase "settings"
     ];
 
     const roleBasedItems = {
       admin: [
-        { path: '/app/users', label: 'Users', icon: '👥' },
-        { path: '/app/bids', label: 'All Bids', icon: '📝' },
-        { path: '/app/reports', label: 'Reports', icon: '📈' }
+        { path: '/app/users', label: 'Users',  },
+        { path: '/app/bids', label: 'All Bids',  },
+        { path: '/app/reports', label: 'Reports',  }
       ],
       organization: [
-        { path: '/app/tender/create', label: 'Create Tender', icon: '➕' },
-        { path: '/app/bids/received', label: 'Received Bids', icon: '📥' },
+        // { path: '/app/tender/create', label: 'Create Tender', icon: '➕' },
+        { path: '/app/bids/received', label: 'Received Bids', },
+        { path: '/app/tender/Evaluate', label: 'Evaluate Bids',},
       ],
       bidder: [
-        { path: '/app/my-bids', label: 'My Bids', icon: '📝' },
-        { path: '/app/bid-history', label: 'Bid History', icon: '📜' }
+        { path: '/app/my-bids', label: 'My Bids',  },
+        { path: '/app/bid-history', label: 'Bid History',  }
       ]
     };
 

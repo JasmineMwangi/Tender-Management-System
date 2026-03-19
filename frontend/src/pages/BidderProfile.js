@@ -326,7 +326,7 @@ const BidderProfile = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
+                    {/* <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Registration Number</label>
                       <input
                         type="text"
@@ -360,8 +360,106 @@ const BidderProfile = () => {
                         disabled={!editing}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-50"
                       />
-                    </div>
+                    </div> */}
+                    <div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">Business Category</label>
+  <select
+    name="businessCategory"
+    value={profile.businessCategory}
+    onChange={handleChange}
+    disabled={!editing}
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-50"
+  >
+    <option value="">-- Select Category --</option>
+    <option value="Infrastructure">Infrastructure</option>
+    <option value="Construction">Construction</option>
+    <option value="Water">Water</option>
+    <option value="Green Energy">Green Energy</option>
+    <option value="IT Services">IT Services</option>
+    <option value="Education">Education</option>
+    <option value="Healthcare">Healthcare</option>
+    <option value="Procurement">Procurement</option>
+    <option value="Consultancy">Consultancy</option>
+    <option value="Transport">Transport</option>
+    <option value="Agriculture">Agriculture</option>
+    <option value="Energy">Energy</option>
+    <option value="Finance">Finance</option>
+    <option value="Security">Security</option>
+    <option value="Cleaning">Cleaning</option>
+    <option value="Catering">Catering</option>
+  </select>
+</div>
+{/* Areas of Expertise — max 3 */}
+<div className="md:col-span-2">
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Areas of Expertise
+    <span className="text-gray-400 text-xs ml-2">(Select up to 3)</span>
+  </label>
+  {(() => {
+    const categories = [
+      'Infrastructure','Construction','Water','Green Energy',
+      'IT Services','Education','Healthcare','Procurement',
+      'Consultancy','Transport','Agriculture','Energy',
+      'Finance','Security','Cleaning','Catering'
+    ];
+    const selected = Array.isArray(profile.expertise) ? profile.expertise :
+      typeof profile.expertise === 'string' ? 
+        (() => { try { return JSON.parse(profile.expertise); } catch { return []; } })() : [];
 
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {categories.map(cat => {
+          const isSelected = selected.includes(cat);
+          const isDisabled = !isSelected && selected.length >= 3;
+          return (
+            <button
+              key={cat}
+              type="button"
+              disabled={!editing || isDisabled}
+              onClick={() => {
+                if (!editing) return;
+                const updated = isSelected
+                  ? selected.filter(e => e !== cat)
+                  : selected.length < 3 ? [...selected, cat] : selected;
+                setProfile(prev => ({ ...prev, expertise: updated }));
+              }}
+              className={`px-3 py-2 rounded-lg text-sm font-medium border-2 transition-all text-left
+                ${isSelected
+                  ? 'border-indigo-500 bg-indigo-50 text-indigo-800'
+                  : isDisabled
+                  ? 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
+                  : 'border-gray-200 bg-white text-gray-700 hover:border-indigo-300 hover:bg-indigo-50'
+                }
+                ${!editing ? 'cursor-default' : 'cursor-pointer'}
+              `}
+            >
+              {isSelected && <span className="mr-1">✓</span>}
+              {cat}
+            </button>
+          );
+        })}
+      </div>
+    );
+  })()}
+  {/* Selected badges */}
+  {(() => {
+    const selected = Array.isArray(profile.expertise) ? profile.expertise :
+      typeof profile.expertise === 'string' ?
+        (() => { try { return JSON.parse(profile.expertise); } catch { return []; } })() : [];
+    return selected.length > 0 ? (
+      <div className="flex flex-wrap gap-2 mt-3">
+        <span className="text-xs text-gray-500 self-center">Selected:</span>
+        {selected.map((exp, i) => (
+          <span key={i} className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-semibold">
+            {exp}
+          </span>
+        ))}
+      </div>
+    ) : (
+      <p className="text-xs text-gray-400 mt-2">No expertise selected yet</p>
+    );
+  })()}
+</div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Years in Business</label>
                       <input
@@ -495,7 +593,7 @@ const BidderProfile = () => {
                       />
                     </div>
 
-                    <div>
+                    {/* <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Routing Number</label>
                       <input
                         type="text"
@@ -505,7 +603,7 @@ const BidderProfile = () => {
                         disabled={!editing}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-50"
                       />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

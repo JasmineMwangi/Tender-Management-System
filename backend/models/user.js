@@ -195,7 +195,16 @@ module.exports = (sequelize, DataTypes) => {
       as: 'tenders'
     });
   }
-
+   if (models.BidderProfile) {
+    User.hasOne(models.BidderProfile, {
+      foreignKey: 'userId',
+      as: 'bidderProfile'    // lowercase, matches your model
+    });
+  }
+  if (models.OrganizationProfile) {
+    User.hasOne(models.OrganizationProfile, 
+      { foreignKey: 'userId', as: 'organizationProfile' });
+  }
   if (models.Bid) {
     User.hasMany(models.Bid, {
       foreignKey: 'userId',

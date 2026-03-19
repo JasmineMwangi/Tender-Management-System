@@ -15,6 +15,7 @@ import MyTenders from './pages/Mytenders';
 import BidList from './pages/BidList';
 import './App.css';
 import ReceivedBids from './pages/ReceivedBids';
+import EvaluateBids from './pages/EvaluateBids';
 import BidHistory from './pages/BidHistory'; 
 
 // Dummy placeholders
@@ -138,6 +139,13 @@ function App() {
                 }
               />
               
+             <Route path="/app/tender/Evaluate"
+               element={
+                <ProtectedRoute>
+               <EvaluateBids />
+               </ProtectedRoute>
+               } />
+
               <Route
                 path="tender/create"
                 element={

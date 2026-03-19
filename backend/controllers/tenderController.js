@@ -1,5 +1,7 @@
 const { Tender, User } = require('../models'); // adjust path if needed
 const { Op } = require('sequelize');
+//const { Tender } = require("../models");
+
 
 // Create a new tender
 exports.createTender = async (req, res) => {
@@ -78,31 +80,6 @@ exports.getAllTenders = async (req, res) => {
 
 
 
-
-
-// exports.getAllTenders = async (req, res) => {
-//   try {
-//     const { search, status } = req.query;
-
-//     const where = {};
-//     if (status && status !== 'all') where.status = status;
-
-//     if (search) {
-//       where[Op.or] = [
-//         { title: { [Op.iLike]: `%${search}%` } },
-//         { description: { [Op.iLike]: `%${search}%` } },
-//         { category: { [Op.iLike]: `%${search}%` } }
-//       ];
-//     }
-
-//     const tenders = await tender.findAll({ where, order: [['createdAt', 'DESC']] });
-//     return res.status(200).json(tenders);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ error: 'Failed to fetch tenders' });
-//   }
-// };
-
 // Get single tender by ID
 exports.getTenderById = async (req, res) => {
   try {
@@ -147,4 +124,23 @@ exports.deleteTender = async (req, res) => {
     return res.status(500).json({ error: 'Failed to delete tender' });
   }
 };
+// const { Tender } = require("../models");
 
+exports.getOrganizationTenders = async (req, res) => {
+  try {
+    const organizationId = req.user.organizationId; // from auth middleware
+
+    const tenders = await Tender.findAll({
+      where: { organizationId }
+    });
+
+    res.json({
+      success: true,
+      data: tenders
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching tenders" });
+  }
+};

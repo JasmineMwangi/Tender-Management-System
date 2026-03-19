@@ -14,6 +14,10 @@ const { connectDB, sequelize } = require('./config/database');
 const tenderRoutes = require('./routes/tenderRoutes');
 const bidRoutes = require('./routes/bidRoutes');
 const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profileroutes');
+const bidEvaluationRoutes  = require('./routes/bidEvaluation');
+const anomalyRoutes        = require('./routes/anomaly');
+const recommendationRoutes = require('./routes/recommendation');
 
 const app = express();
 
@@ -47,7 +51,17 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // ------------------- Routes -------------------
 app.use('/api/auth', authRoutes);
 app.use('/api/tenders', tenderRoutes);
-app.use('/api/bids', bidRoutes); // ✅ No hardcoded /api/bids inside bidRoutes
+app.use('/api/bids', bidRoutes); 
+app.use('/api/profiles', profileRoutes);
+
+// Evaluation, Anomaly & Recommendation routes
+// const bidEvaluationRoutes  = require('./routes/bidEvaluation');
+// const anomalyRoutes        = require('./routes/anomaly');
+// const recommendationRoutes = require('./routes/recommendation');
+
+app.use('/api/evaluations',     bidEvaluationRoutes);
+app.use('/api/anomalies',       anomalyRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 
 // ------------------- Health Check -------------------
 app.get('/api/health', (req, res) => {
@@ -64,7 +78,7 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     await connectDB();
-    await sequelize.sync({ force: true, logging: console.log }); // change to { alter: true } in production
+    await sequelize.sync({ alter: true, logging: false }); // change to { alter: true } in production
 
     console.table(listEndpoints(app)); // ✅ Log available routes
     app.listen(PORT, () => {
